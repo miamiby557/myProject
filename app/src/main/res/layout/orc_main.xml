@@ -1,0 +1,117 @@
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/background_light"
+    android:id="@+id/transport_table">
+    <TableRow
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent">
+        <Button
+            android:layout_width="90dp"
+            android:layout_height="wrap_content"
+            android:text="@string/back"
+            android:id="@+id/orc_back" android:layout_column="1"/>
+        <TextView
+            android:layout_width="250dp"
+            android:layout_height="30dp"
+            android:text="文字识别"
+            android:id="@+id/textView2" android:gravity="center" android:layout_column="2"/>
+    </TableRow>
+
+    <TableLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:gravity="center">
+            <RelativeLayout
+                android:id="@+id/bottombar"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:gravity="center">
+
+                <RadioGroup
+                    android:id="@+id/radiogroup"
+                    android:layout_width="wrap_content"
+                    android:layout_height="50dp"
+                    android:layout_alignParentLeft="true"
+                    android:orientation="horizontal">
+
+                    <RadioButton
+                        android:id="@+id/rb_en"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:checked="true"
+                        android:text="@string/eng_num"
+                        android:textColor="@android:color/black" />
+
+                    <RadioButton
+                        android:id="@+id/rb_ch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:text="@string/ch_num"
+                        android:checked="false"
+                        android:textColor="@android:color/black" />
+                </RadioGroup>
+
+            </RelativeLayout>
+
+            <Button
+                android:id="@+id/btn_camera"
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:layout_alignParentRight="false"
+                android:text="拍照"
+                android:layout_alignParentBottom="false"
+                android:layout_alignWithParentIfMissing="false"
+                android:layout_column="1" />
+        </TableRow>
+        <TableLayout android:layout_height="519dp">
+            <TableRow android:gravity="center">
+                <ScrollView
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:layout_above="@id/bottombar"
+                    android:layout_alignParentTop="true" >
+
+                    <LinearLayout
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:gravity="center">
+
+                        <TextView
+                            android:id="@+id/tv_result"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="扫描结果：" />
+
+                        <TextView
+                            android:layout_width="95dp"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/result_text" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="选取的图片：" />
+
+                        <ImageView
+                            android:id="@+id/iv_selected"
+                            android:layout_width="350dp"
+                            android:layout_height="wrap_content"
+                            android:adjustViewBounds="true"
+                            android:maxHeight="300dp" />
+
+                    </LinearLayout>
+                </ScrollView>
+            </TableRow>
+        </TableLayout>
+    </TableLayout>
+</TableLayout>
