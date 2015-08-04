@@ -48,6 +48,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener,Vi
 	private ImageView settings_image;
 	private TextView settings_text;
 	private TextView found_text;
+
 	//定义要用的颜色值
 	private int whirt = 0xFFFFFFFF;
 	private int gray = 0xFF7597B3;
