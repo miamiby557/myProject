@@ -95,6 +95,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener,Vi
 		}else{
 			setChioceItem(1);
 		}
+
 		Intent intent = new Intent(getApplicationContext(), LocationService.class);
 		getApplicationContext().startService(intent);
 	}
@@ -112,7 +113,6 @@ public class MainActivity extends FragmentActivity implements OnClickListener,Vi
 		settings_layout.setOnClickListener(this);
 	}
 	
-	//重写onClick事件
 	@Override
 	public void onClick(View view) {
 		switch (view.getId()) {
