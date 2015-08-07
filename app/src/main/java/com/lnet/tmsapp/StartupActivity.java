@@ -53,7 +53,6 @@ public class StartupActivity extends FragmentActivity{
     }
 
     private void loadData() {
-        //city
         //省份优先加载
         String url = mySharedPreferences.getString("serviceAddress","");
         if(url.length()!=0){
@@ -74,12 +73,10 @@ public class StartupActivity extends FragmentActivity{
                         }
                     }
                     application.setProvinces(provinces);
-
                 }
             };
             String cityUrl =url+"/order/getSupperBaseRegion";
             cityArrayHelper.get(cityUrl);
         }
-
     }
 }
