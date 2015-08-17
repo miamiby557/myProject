@@ -30,9 +30,6 @@ public class StartupActivity extends FragmentActivity{
     ApplicationTrans application;
     RequestQueue requestQueue;
     SharedPreferences mySharedPreferences;
-    SharedPreferences.Editor editor;
-    String FILENAME = "info";
-    int MODE = MODE_PRIVATE;
 
 
     @Override
@@ -41,7 +38,7 @@ public class StartupActivity extends FragmentActivity{
         setContentView(R.layout.startup);
         application = (ApplicationTrans)getApplication();
         requestQueue = Volley.newRequestQueue(getApplicationContext());
-        mySharedPreferences = getSharedPreferences(FILENAME,MODE);
+        mySharedPreferences = getSharedPreferences(application.getFILENAME(),application.getMODE());
         new Handler().postDelayed(new Runnable() {
             public void run() {
                 Intent mainIntent = new Intent(StartupActivity.this, LoginActivity.class);

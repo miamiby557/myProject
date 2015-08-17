@@ -33,7 +33,7 @@
                         <EditText
                             android:layout_width="250dp"
                             android:layout_height="wrap_content" android:hint="输入运输单号"
-                            android:id="@+id/add_order" android:inputType="text|number"
+                            android:id="@+id/add_order" android:inputType="text"
                             android:drawableRight="@drawable/scaning"
                             android:layout_marginLeft="5dp" />
 
@@ -171,13 +171,13 @@
                                 android:layout_height="wrap_content"
                                 android:id="@+id/totalItemQuantity" android:inputType="number"
                                 android:hint="总数量"
-                            android:visibility="gone" />
+                            android:visibility="visible" />
                         <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="个"
                                 android:id="@+id/textV"
-                            android:visibility="gone" />
+                            android:visibility="visible" />
 
                         <EditText
                             android:layout_width="100dp"

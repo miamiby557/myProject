@@ -9,6 +9,9 @@ import android.content.SharedPreferences;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
@@ -52,8 +55,6 @@ public class LoginActivity extends Activity {
     RequestQueue requestQueue;
     SharedPreferences mySharedPreferences;
     SharedPreferences.Editor editor;
-    String FILENAME = "info";
-    int MODE = MODE_PRIVATE;
     ApplicationTrans application;
 
     @Override
@@ -74,9 +75,9 @@ public class LoginActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login2);
         requestQueue = Volley.newRequestQueue(getApplicationContext());
-        lm=(LocationManager)getSystemService(Context.LOCATION_SERVICE);
-        mySharedPreferences = getSharedPreferences(FILENAME,MODE);
         application = (ApplicationTrans)getApplication();
+        lm=(LocationManager)getSystemService(Context.LOCATION_SERVICE);
+        mySharedPreferences = getSharedPreferences(application.getFILENAME(),application.getMODE());
         loginButton = (Button) findViewById(R.id.btn_login);
         testService = (Button)findViewById(R.id.service_config);
         textName = (EditText)findViewById(R.id.login_name);
@@ -118,6 +119,7 @@ public class LoginActivity extends Activity {
                 Intent intent = new Intent();
                 intent.setClass(LoginActivity.this, ServiceConfigActivity.class);
                 startActivity(intent);
+
             }
         });
 

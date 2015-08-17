@@ -70,7 +70,7 @@ public class FeeDeclareFragment extends Fragment {
     ImageView imageView;
     boolean hasPic = false;
     ScrollView scrollView;
-    int rowId = 0;
+    int rowId = 1;
     int count = 1;//标记table内EditText
     List<DataItem> items = new ArrayList<>();
     private String capturePath = null;
@@ -183,7 +183,7 @@ public class FeeDeclareFragment extends Fragment {
     //增加费用科目
     private void addFeeDeclare(){
         TableRow row = new TableRow(getActivity());
-        row.setId(rowId);
+        row.setId(rowId + 0);
         EditText feeDeclareName = new EditText(getActivity());
         feeDeclareName.setId(count++);
         feeDeclareName.setFocusable(true);
@@ -202,15 +202,16 @@ public class FeeDeclareFragment extends Fragment {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                table.removeView(table.findViewById(v.getId() - 1000));
+                TableRow tableRow = (TableRow) v.getParent();
+                table.removeView(tableRow);
             }
         });
 
         row.addView(feeDeclareName);
         row.addView(money);
         row.addView(button);
-        rowId++;
         table.addView(row);
+        rowId++;
     }
 
     private void saveFeeDeclare(){

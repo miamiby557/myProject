@@ -64,7 +64,7 @@
                         android:drawablePadding="15dp"
                         android:id="@+id/t_number"
                         android:hint="输入客户单号"
-                        android:inputType="textVisiblePassword" />
+                        android:inputType="text" />
 
                 </LinearLayout>
 

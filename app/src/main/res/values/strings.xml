@@ -28,6 +28,7 @@
     <string name="add_order">添加</string>
     <string name="calculate">计算</string>
     <string name="calculate_result">计算结果</string>
+    <string name="complete">完成</string>
     <string name="save">保存</string>
     <string name="log_out">退出当前账号</string>
     <string name="transport_type">运输方式：</string>

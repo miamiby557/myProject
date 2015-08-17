@@ -1,12 +1,14 @@
 package com.lnet.tmsapp;
 
 import android.app.ActionBar;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.ActionBarActivity;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
@@ -28,8 +30,9 @@ import java.util.HashMap;
 /**
  * Created by Administrator on 2015/7/30.
  */
-public class ServiceConfigActivity extends FragmentActivity{
+public class ServiceConfigActivity extends Activity{
     EditText serviceAddress;
+    EditText port;
     Button testButton;
     Button save;
     ProgressDialog testServiceDialog;
@@ -37,8 +40,6 @@ public class ServiceConfigActivity extends FragmentActivity{
     RequestQueue requestQueue;
     SharedPreferences mySharedPreferences;
     SharedPreferences.Editor editor;
-    String FILENAME = "info";
-    int MODE = MODE_PRIVATE;
     ApplicationTrans application;
 
     LinearLayout linearLayout;
@@ -70,15 +71,17 @@ public class ServiceConfigActivity extends FragmentActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.service_config);
         serviceAddress = (EditText)findViewById(R.id.ser_address);
+        port = (EditText)findViewById(R.id.port);
         testButton = (Button)findViewById(R.id.service_test_btn);
         save = (Button)findViewById(R.id.btn_service);
-
-        requestQueue = Volley.newRequestQueue(getApplicationContext());
-        mySharedPreferences = getSharedPreferences(FILENAME, MODE);
         application = (ApplicationTrans)getApplication();
+        requestQueue = Volley.newRequestQueue(getApplicationContext());
+        mySharedPreferences = getSharedPreferences(application.getFILENAME(), application.getMODE());
 
-        String serviceAdd = mySharedPreferences.getString("ip","");
-        serviceAddress.setText(serviceAdd);
+        String ip = mySharedPreferences.getString("ip","");
+        serviceAddress.setText(ip);
+        String portS = mySharedPreferences.getString("port","");
+        port.setText(portS);
 
         testButton.setOnClickListener(new TestListener());
         save.setOnClickListener(new SaveListener());
@@ -98,8 +101,12 @@ public class ServiceConfigActivity extends FragmentActivity{
         @Override
         public void onClick(View v) {
             String text = serviceAddress.getText().toString().trim();
-            if(text.length()==0){
-                showMassage("请输入服务器ip和端口！");
+            if(!check(text)){
+                showMassage("请输入服务器ip!");
+                return;
+            }
+            if(!check(port.getText().toString().trim())){
+                showMassage("请输入端口号!");
                 return;
             }
             testService();
@@ -109,15 +116,21 @@ public class ServiceConfigActivity extends FragmentActivity{
 
         @Override
         public void onClick(View v) {
-            String text = serviceAddress.getText().toString().trim();
-            if(text.length()==0){
-                showMassage("请输入服务器ip和端口！");
+            String ip = serviceAddress.getText().toString().trim();
+            if(!check(ip)){
+                showMassage("请输入服务器ip!");
+                return;
+            }
+            String portString = port.getText().toString().trim();
+            if(!check(portString)){
+                showMassage("请输入端口号!");
                 return;
             }
             editor = mySharedPreferences.edit();
-            String serAddress = serviceAddress.getText().toString().trim();
+            String serAddress = serviceAddress.getText().toString().trim()+":"+port.getText().toString().trim();
             editor.putString("serviceAddress", "http://"+serAddress+"/service/rest");
-            editor.putString("ip",serAddress);
+            editor.putString("ip",ip);
+            editor.putString("port",portString);
             editor.commit();
             Intent intent = new Intent();
             intent.setClass(ServiceConfigActivity.this,LoginActivity.class);
@@ -126,8 +139,9 @@ public class ServiceConfigActivity extends FragmentActivity{
         }
     }
     private void testService() {
+        String address = serviceAddress.getText().toString().trim()+":"+port.getText().toString().trim();
         testServiceDialog = ProgressDialog.show(ServiceConfigActivity.this, "测试提示", "...测试中...");
-        String serAddress = "http://"+serviceAddress.getText().toString().trim()+"/service/rest/sysUser/testService";
+        String serAddress = "http://"+address+"/service/rest/sysUser/testService";
         HttpHelper httpHelper = new HttpHelper(application,ServiceConfigActivity.this,requestQueue,testServiceDialog) {
 
             @Override
@@ -151,5 +165,12 @@ public class ServiceConfigActivity extends FragmentActivity{
         builder.setMessage(massage) ;
         builder.setPositiveButton("重新操作" ,  null );
         builder.show();
+    }
+
+    private boolean check(String value){
+        if(value.length()!=0){
+           return true;
+        }
+        return false;
     }
 }

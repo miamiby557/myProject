@@ -302,7 +302,6 @@ public class CarrierOrderCreateFragment extends Fragment {
                     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                         String textValue = ((DataItem) spinner.getSelectedItem()).getTextValue();
                         editText.setText(textValue);
-                        showToast(textValue);
                     }
 
                     @Override
@@ -391,10 +390,10 @@ public class CarrierOrderCreateFragment extends Fragment {
             showMassage("目的城市为空!");
             return;
         }
-        if(!check(totalItemQuantity.getText().toString().trim())) {
+        /*if(!check(totalItemQuantity.getText().toString().trim())) {
             showMassage("数量为空!");
             return;
-        }
+        }*/
         if(!check(totalPackageQuantity.getText().toString().trim())) {
             showMassage("件数为空!");
             return;
@@ -593,10 +592,10 @@ public class CarrierOrderCreateFragment extends Fragment {
             showMassage("目的城市为空!");
             return;
         }
-        if(!check(totalItemQuantity.getText().toString().trim())) {
+        /*if(!check(totalItemQuantity.getText().toString().trim())) {
             showMassage("数量为空!");
             return;
-        }
+        }*/
         if(!check(totalPackageQuantity.getText().toString().trim())) {
             showMassage("件数为空!");
             return;
@@ -704,7 +703,8 @@ public class CarrierOrderCreateFragment extends Fragment {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                table.removeView(table.findViewById(v.getId() - 1000));
+                TableRow tableRow = (TableRow)v.getParent();
+                table.removeView(tableRow);
                 numbers.remove(orderNumber);
                 details.remove(detail);
             }

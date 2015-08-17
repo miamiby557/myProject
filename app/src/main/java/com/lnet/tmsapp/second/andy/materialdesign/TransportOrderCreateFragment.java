@@ -244,8 +244,8 @@ public class TransportOrderCreateFragment extends Fragment {
                             Boolean isSuccess = response.getBoolean("success");
                             if(isSuccess){
                                 AlertDialog.Builder builder  = new AlertDialog.Builder(getActivity());
-                                builder.setTitle("提示" ) ;
-                                builder.setMessage("已经有此单号！" ) ;
+                                builder.setTitle("提示" );
+                                builder.setMessage("已经有此单号！" );
                                 builder.setPositiveButton("重新输入" ,  null );
                                 builder.show();
                             }
@@ -312,10 +312,10 @@ public class TransportOrderCreateFragment extends Fragment {
             showMassage("重量为空!");
             return;
         }
-        if(!check(totalItemQuantity.getText().toString().trim())){
+        /*if(!check(totalItemQuantity.getText().toString().trim())){
             showMassage("数量为空!");
             return;
-        }
+        }*/
         if(!check(totalPackageQuantity.getText().toString().trim())){
             showMassage("件数为空!");
             return;
@@ -338,6 +338,7 @@ public class TransportOrderCreateFragment extends Fragment {
         order.setTotalPackageQuantity(Integer.parseInt(totalPackageQuantity.getText().toString().trim()));
         order.setOrderDispatchType(Integer.parseInt(dispatchTypeValue.getText().toString()));
         order.update(company.getText().toString().trim(),receiveMan.getText().toString().trim(),receiveManPhone.getText().toString().trim(),receiveAddress.getText().toString().trim());
+        order.setOrderType(2);
         progressDialog = ProgressDialog.show(getActivity(), "创建提示", "...创建中...");
         String userId = application.getUserId();
         if(check(startCityIdValue.getText().toString())){

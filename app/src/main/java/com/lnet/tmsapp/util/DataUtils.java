@@ -68,9 +68,9 @@ public class DataUtils {
         DataItem item5 = new DataItem("5","油卡付+现金");
         DataItem defaultItem = new DataItem("","请选择计费方式");
 //        items.add(defaultItem);
+        items.add(item3);
         items.add(item1);
         items.add(item2);
-        items.add(item3);
         items.add(item4);
         items.add(item5);
         return items;
