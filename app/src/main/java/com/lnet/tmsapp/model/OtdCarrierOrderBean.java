@@ -43,8 +43,7 @@ public class OtdCarrierOrderBean implements Serializable{
     public OtdCarrierOrderBean() {
     }
 
-    public void update(UUID transferOrganizationId, Integer paymentType, String consignee, String consigneeAddress, String consigneePhone, String goodsName, String remark) {
-        this.transferOrganizationId = transferOrganizationId;
+    public void update(Integer paymentType, String consignee, String consigneeAddress, String consigneePhone, String goodsName, String remark) {
         this.paymentType = paymentType;
         this.consignee = consignee;
         this.consigneeAddress = consigneeAddress;
@@ -53,9 +52,8 @@ public class OtdCarrierOrderBean implements Serializable{
         this.remark = remark;
     }
 
-    public void update(UUID carrierId,UUID startCityId, UUID destCityId, String carrierOrderNumber, Integer calculateType, Integer transportType,UUID createUserId,Integer totalPackageQuantity,Double totalVolume,Double totalWeight,Boolean isUpstairs) {
+    public void update(UUID carrierId,UUID destCityId, String carrierOrderNumber, Integer calculateType, Integer transportType,UUID createUserId,Integer totalPackageQuantity,Double totalVolume,Double totalWeight,Boolean isUpstairs) {
         this.carrierId = carrierId;
-        this.startCityId = startCityId;
         this.destCityId = destCityId;
         this.carrierOrderNumber = carrierOrderNumber;
         this.calculateType = calculateType;

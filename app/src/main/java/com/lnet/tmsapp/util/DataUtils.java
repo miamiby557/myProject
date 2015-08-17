@@ -20,7 +20,7 @@ public class DataUtils {
         DataItem item8 = new DataItem("8","铁路");
         DataItem item9 = new DataItem("9","内河航运");
         DataItem defaultItem = new DataItem("","请选择运输方式");
-        items.add(defaultItem);
+//        items.add(defaultItem);
         items.add(item1);
         items.add(item2);
         items.add(item3);
@@ -33,6 +33,17 @@ public class DataUtils {
         return items;
     }
 
+    public static List<DataItem> getOrderDispatchType(){
+        List<DataItem> items = new ArrayList<>();
+        DataItem defaultItem = new DataItem("","请选择调度类型");
+        DataItem item1 = new DataItem("1","市内配送");
+        DataItem item2 = new DataItem("2","提货发运");
+//        items.add(defaultItem);
+        items.add(item1);
+        items.add(item2);
+        return items;
+    }
+
 
 
     public static List<DataItem> getCalculateType(){
@@ -41,7 +52,7 @@ public class DataUtils {
         DataItem item1 = new DataItem("1","重量");
         DataItem item2 = new DataItem("2","件数");
         DataItem defaultItem = new DataItem("","请选择计费方式");
-        items.add(defaultItem);
+//        items.add(defaultItem);
         items.add(item3);
         items.add(item2);
         items.add(item1);
@@ -56,7 +67,7 @@ public class DataUtils {
         DataItem item4 = new DataItem("4","油卡付");
         DataItem item5 = new DataItem("5","油卡付+现金");
         DataItem defaultItem = new DataItem("","请选择计费方式");
-        items.add(defaultItem);
+//        items.add(defaultItem);
         items.add(item1);
         items.add(item2);
         items.add(item3);

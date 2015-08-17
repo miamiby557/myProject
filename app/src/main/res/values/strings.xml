@@ -64,4 +64,27 @@
     <string name="count_number">件</string>
     <string name="scan_code">扫描</string>
     <string name="view_more">查看更多</string>
+
+    <string name="title_car_send">发车</string>
+    <string name="title_car_back">回场</string>
+    <string name="title_transport_order_create">提货开单</string>
+    <string name="title_carrier_order_create">托运开单</string>
+    <string name="title_carrier_order">我的托运单</string>
+    <string name="title_transport_order_list">我的提货单</string>
+    <string name="title_paichedan_list">我的派车单</string>
+    <string name="title_person_info">个人信息</string>
+    <string name="title_home">主页</string>
+    <string name="title_logout">退出</string>
+
+    <string name="drawer_open">Open</string>
+        <string name="drawer_close">Close</string>
+    <string-array name="nav_drawer_labels">
+                <item>主页</item>
+                <item>我的提货单</item>
+                <item>我的托运单</item>
+                <item>我的派车单</item>
+                <item>费用申报</item>
+                <item>个人信息</item>
+            </string-array>
+
 </resources>

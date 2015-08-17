@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ScrollView;
 import android.widget.Spinner;
@@ -55,40 +56,10 @@ public class CarrierOrderAddOtherActivity extends FragmentActivity{
     SharedPreferences mySharedPreferences;
     String FILENAME = "info";
     int MODE = MODE_PRIVATE;
-    int OK = 2;
+    int OK = 1;
     ScrollView activity_main;
     OtdCarrierOrderBean order = new OtdCarrierOrderBean();
-
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        ActionBar actionBar = this.getActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_complete, menu);
-        return super.onCreateOptionsMenu(menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item)
-    {
-        switch (item.getItemId())
-        {
-            case android.R.id.home:
-                cancel();
-                return true;
-            case R.id.complete:
-                save();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
+    Button complete;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,6 +74,7 @@ public class CarrierOrderAddOtherActivity extends FragmentActivity{
         receiveAddress = (EditText)findViewById(R.id.c_receive_address);
         goodsName = (EditText)findViewById(R.id.goods_name);
         remarks = (EditText)findViewById(R.id.remarks);
+        complete = (Button)findViewById(R.id.button_complete);
 
         application = (ApplicationTrans)getApplication();
         requestQueue = Volley.newRequestQueue(getApplicationContext());
@@ -125,6 +97,13 @@ public class CarrierOrderAddOtherActivity extends FragmentActivity{
                reFillData(order);
             }
         }
+
+        complete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                save();
+            }
+        });
 
     }
 
@@ -163,11 +142,6 @@ public class CarrierOrderAddOtherActivity extends FragmentActivity{
 
     private void save(){
         //保存
-        String organizationValue = transportOrganizationValue.getText().toString();
-        UUID organizationId = null;
-        if(organizationValue.length()!=0){
-            organizationId = UUID.fromString(organizationValue);
-        }
         Integer paymentType = null;
         if(paymentTypeValue.getText().length()!=0){
             paymentType = Integer.parseInt(paymentTypeValue.getText().toString());
@@ -177,7 +151,7 @@ public class CarrierOrderAddOtherActivity extends FragmentActivity{
         String address = receiveAddress.getText().toString().trim();
         String name = goodsName.getText().toString().trim();
         String remark = remarks.getText().toString().trim();
-        order.update(organizationId, paymentType, receMan, address, phone, name, remark);
+        order.update(paymentType, receMan, address, phone, name, remark);
 
         Intent resultIntent = new Intent();
         Bundle bundle = new Bundle();
@@ -187,17 +161,9 @@ public class CarrierOrderAddOtherActivity extends FragmentActivity{
         this.finish();
     }
 
-    private void cancel(){
-        Intent resultIntent = new Intent();
-        Bundle bundle = new Bundle();
-        resultIntent.putExtras(bundle);
-        this.setResult(OK, resultIntent);
-        this.finish();
-    }
-
     private void bindOrganization() {
         //绑定中转站
-        if(application.getOrganizationList().size()==0){
+        if(application.getOrganizationList()==null){
             final List<DataItem> organizationList = new ArrayList<>();
             HttpArrayHelper arrayHelper = new HttpArrayHelper(application,CarrierOrderAddOtherActivity.this,requestQueue,null) {
                 @Override
@@ -219,8 +185,9 @@ public class CarrierOrderAddOtherActivity extends FragmentActivity{
                                 String textValue = ((DataItem) transportOrganization.getSelectedItem()).getTextValue();
                                 if(textValue.length()>0){
                                     order.setTransferOrganizationId(UUID.fromString(textValue));
+                                    order.setOrganizationIdPosition(position);
                                 }
-                                order.setOrganizationIdPosition(position);
+
                             }
                             @Override
                             public void onNothingSelected(AdapterView<?> arg0) {
@@ -239,8 +206,10 @@ public class CarrierOrderAddOtherActivity extends FragmentActivity{
             transportOrganization.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                     String textValue = ((DataItem) transportOrganization.getSelectedItem()).getTextValue();
-                    transportOrganizationValue.setText(textValue);
-                    order.setOrganizationIdPosition(position);
+                    if(textValue.length()>0){
+                        order.setTransferOrganizationId(UUID.fromString(textValue));
+                        order.setOrganizationIdPosition(position);
+                    }
                 }
                 @Override
                 public void onNothingSelected(AdapterView<?> arg0) {

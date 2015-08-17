@@ -25,6 +25,7 @@ import com.android.volley.toolbox.Volley;
 import com.lnet.tmsapp.application.ApplicationTrans;
 import com.lnet.tmsapp.model.HttpArrayHelper;
 import com.lnet.tmsapp.model.HttpHelper;
+import com.lnet.tmsapp.second.andy.materialdesign.*;
 import com.lnet.tmsapp.util.DataItem;
 
 import org.json.JSONArray;
@@ -81,7 +82,6 @@ public class LoginActivity extends Activity {
         textName = (EditText)findViewById(R.id.login_name);
         textPwd = (EditText)findViewById(R.id.login_pwd);
         checkBox = (CheckBox)findViewById(R.id.rememberMe);
-
         //加载用户信息
         String userName = mySharedPreferences.getString("userName","");
         textName.setText(userName);
@@ -156,14 +156,12 @@ public class LoginActivity extends Activity {
                             String userName = response.getString("username");
                             application.setUserId(userId);
                             application.setLoginName(userName);
-                            if(application.getProvinces().size()==0){
-                                reloadProvinces();
-                            }
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
+                        loadProvinces();
                         Intent intent = new Intent();
-                        intent.setClass(LoginActivity.this, MainActivity.class);
+                        intent.setClass(LoginActivity.this, com.lnet.tmsapp.second.andy.materialdesign.MainActivity.class);
                         startActivity(intent);
                         Toast.makeText(getApplicationContext(), "欢迎您，" + application.getLoginName(), Toast.LENGTH_SHORT).show();
                     }
@@ -178,10 +176,9 @@ public class LoginActivity extends Activity {
         });
     }
 
-    private void reloadProvinces(){
+    private void loadProvinces(){
         final List<DataItem> provinces = new ArrayList<>();
-        RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
-        HttpArrayHelper cityArrayHelper = new HttpArrayHelper(application,LoginActivity.this,queue,null) {
+        HttpArrayHelper provinceHelper = new HttpArrayHelper(application,LoginActivity.this,requestQueue,null) {
             @Override
             public void onResponse(JSONArray response) {
                 DataItem defaultItem = new DataItem("","选择省份");
@@ -200,7 +197,7 @@ public class LoginActivity extends Activity {
             }
         };
         String cityUrl =mySharedPreferences.getString("serviceAddress","")+"/order/getSupperBaseRegion";
-        cityArrayHelper.get(cityUrl);
+        provinceHelper.get(cityUrl);
     }
 
 }

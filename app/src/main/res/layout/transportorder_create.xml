@@ -102,34 +102,74 @@
                         android:layout_height="wrap_content">
 
                         <EditText
-                            android:layout_width="150dp"
+                            android:layout_width="100dp"
                             android:layout_height="wrap_content"
-                            android:id="@+id/t_totalPackageQuantity" android:inputType="numberDecimal"
-                            android:hint="输入件数" />
+                            android:id="@+id/t_totalItemQuantity" android:inputType="numberDecimal"
+                            android:hint="总数量" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="个"
+                            android:id="@+id/textView33" />
+
+                        <EditText
+                            android:layout_width="100dp"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/t_totalPackageQuantity"
+                            android:inputType="numberDecimal"
+                            android:hint="总件数" />
+
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="件"
-                            android:id="@+id/textView33" />
+                            android:id="@+id/textView26" />
 
                     </LinearLayout>
-
                     <LinearLayout
+                        android:orientation="horizontal"
+                        android:layout_width="fill_parent"
+                        android:layout_height="fill_parent">
+
+                        <Spinner
+                            android:layout_width="130dp"
+                            android:layout_height="70dp"
+                            android:id="@+id/t_province1" />
+
+                        <Spinner
+                            android:layout_width="170dp"
+                            android:layout_height="70dp"
+                            android:id="@+id/t_start_city"
+                            android:layout_marginLeft="20dp"
+                            android:visibility="invisible" />
+                    </LinearLayout>
+                <LinearLayout
                     android:orientation="horizontal"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent">
 
                     <Spinner
                         android:layout_width="130dp"
                         android:layout_height="70dp"
-                        android:id="@+id/t_province" />
+                        android:id="@+id/t_province2" />
 
                     <Spinner
-                        android:layout_width="130dp"
+                        android:layout_width="170dp"
                         android:layout_height="70dp"
-                        android:id="@+id/t_city"
+                        android:id="@+id/t_dest_city"
                         android:layout_marginLeft="20dp"
                         android:visibility="invisible" />
+
+                    </LinearLayout>
+                    <LinearLayout
+                        android:orientation="horizontal"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content">
+
+                        <Spinner
+                            android:layout_width="fill_parent"
+                            android:layout_height="70dp"
+                            android:id="@+id/t_dispatchType" />
                 </LinearLayout>
                     <LinearLayout
                         android:layout_width="fill_parent"

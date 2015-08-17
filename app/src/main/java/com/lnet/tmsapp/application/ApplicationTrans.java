@@ -2,6 +2,8 @@ package com.lnet.tmsapp.application;
 
 import android.app.Application;
 
+import com.lnet.tmsapp.model.DispatchVehicle;
+import com.lnet.tmsapp.model.OtdCarrierOrderBean;
 import com.lnet.tmsapp.util.DataItem;
 
 import java.util.ArrayList;
@@ -17,13 +19,30 @@ public class ApplicationTrans extends Application{
     private String currentCity;
     private String currentCityId;
 
+    private OtdCarrierOrderBean temp;
+
     private String cookie;
 
-    private List<DataItem> provinces = new ArrayList<>();
+    private List<DataItem> provinces;
 
-    private List<DataItem> organizationList = new ArrayList<>();
+    private List<DataItem> organizationList;
+
+    private List<DataItem> clientDatas;
+
+    private List<DataItem> carrierDatas;
+
+    private List<DataItem> transportOrderItem;
+
+    private List<DataItem> carrierOrderItem;
+
+    private List<DataItem> dispatchAssignList;
+
+    private List<DispatchVehicle> cars;
 
     private String SERVICE_ADDRESS;
+
+    private String FILENAME = "info";
+    private int MODE = 0x0000;
 
 
     public String getLoginName() {
@@ -89,5 +108,77 @@ public class ApplicationTrans extends Application{
 
     public void setOrganizationList(List<DataItem> organizationList) {
         this.organizationList = organizationList;
+    }
+
+    public String getFILENAME() {
+        return FILENAME;
+    }
+
+    public void setFILENAME(String FILENAME) {
+        this.FILENAME = FILENAME;
+    }
+
+    public int getMODE() {
+        return MODE;
+    }
+
+    public void setMODE(int MODE) {
+        this.MODE = MODE;
+    }
+
+    public OtdCarrierOrderBean getTemp() {
+        return temp;
+    }
+
+    public void setTemp(OtdCarrierOrderBean temp) {
+        this.temp = temp;
+    }
+
+    public List<DataItem> getTransportOrderItem() {
+        return transportOrderItem;
+    }
+
+    public void setTransportOrderItem(List<DataItem> transportOrderItem) {
+        this.transportOrderItem = transportOrderItem;
+    }
+
+    public List<DataItem> getCarrierOrderItem() {
+        return carrierOrderItem;
+    }
+
+    public void setCarrierOrderItem(List<DataItem> carrierOrderItem) {
+        this.carrierOrderItem = carrierOrderItem;
+    }
+
+    public List<DataItem> getClientDatas() {
+        return clientDatas;
+    }
+
+    public void setClientDatas(List<DataItem> clientDatas) {
+        this.clientDatas = clientDatas;
+    }
+
+    public List<DataItem> getCarrierDatas() {
+        return carrierDatas;
+    }
+
+    public void setCarrierDatas(List<DataItem> carrierDatas) {
+        this.carrierDatas = carrierDatas;
+    }
+
+    public List<DispatchVehicle> getCars() {
+        return cars;
+    }
+
+    public void setCars(List<DispatchVehicle> cars) {
+        this.cars = cars;
+    }
+
+    public List<DataItem> getDispatchAssignList() {
+        return dispatchAssignList;
+    }
+
+    public void setDispatchAssignList(List<DataItem> dispatchAssignList) {
+        this.dispatchAssignList = dispatchAssignList;
     }
 }

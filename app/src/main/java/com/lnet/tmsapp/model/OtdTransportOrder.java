@@ -59,6 +59,7 @@ public class OtdTransportOrder {
     private String wrapTypeName;
     private UUID mergeTransportOrderId;
     private Integer mergeStatus;
+    private Integer orderDispatchType;
 
     public OtdTransportOrder() {
     }
@@ -75,12 +76,12 @@ public class OtdTransportOrder {
         this.receiveAddress = receiveAddress;
     }
 
-    public void update(String clientOrderNumber, UUID clientId, UUID destCityId, Double confirmedVolume, Double confirmedWeight,UUID createUserId) {
+    public void update(String clientOrderNumber, UUID clientId, UUID destCityId, Double totalVolume, Double totalWeight,UUID createUserId) {
         this.clientOrderNumber = clientOrderNumber;
         this.clientId = clientId;
         this.destCityId = destCityId;
-        this.confirmedVolume = confirmedVolume;
-        this.confirmedWeight = confirmedWeight;
+        this.totalVolume = totalVolume;
+        this.totalWeight = totalWeight;
         this.createUserId = createUserId;
         this.modifyDate = DateUtils.getTimestampNow();
         this.createDate = DateUtils.getTimestampNow();
@@ -504,5 +505,13 @@ public class OtdTransportOrder {
     @Override
     public String toString() {
         return clientOrderNumber;
+    }
+
+    public Integer getOrderDispatchType() {
+        return orderDispatchType;
+    }
+
+    public void setOrderDispatchType(Integer orderDispatchType) {
+        this.orderDispatchType = orderDispatchType;
     }
 }

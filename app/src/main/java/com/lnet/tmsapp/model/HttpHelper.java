@@ -112,7 +112,11 @@ public abstract class HttpHelper {
             }
 
         } catch (JSONException e) {
+            if (progressDialog.isShowing() && progressDialog != null) {
+                progressDialog.dismiss();
+            }
             windowTitle("服务器异常！");
+            e.printStackTrace();
         }
     }
 
@@ -187,7 +191,7 @@ public abstract class HttpHelper {
                     new Response.Listener<JSONObject>() {
                         @Override
                         public void onResponse(JSONObject response) {
-                            resolveLogin(response,loginButton);
+                            resolveLogin(response, loginButton);
                         }
                     },
                     new Response.ErrorListener() {
@@ -225,6 +229,39 @@ public abstract class HttpHelper {
                             return localHashMap;
                         }
                     };
+
+            requestQueue.add(request);
+
+        } catch (Exception e) {
+            showMessage(activity, e.getLocalizedMessage());
+        }
+    }
+
+    public void loginout(String url, JSONObject data) {
+        try {
+            JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, url, data,
+                    new Response.Listener<JSONObject>() {
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            resolveServiceTest(response);
+                        }
+                    },
+                    new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            if (progressDialog.isShowing() && progressDialog != null) {
+                                progressDialog.dismiss();
+                            }
+                            windowTitle("服务器异常！");
+                        }
+                    }){
+                        @Override
+                        public Map<String, String> getHeaders() throws AuthFailureError {
+                            Map localHashMap = new HashMap();
+                            localHashMap.put("Cookie", application.getCookie());
+                            return localHashMap;
+                        }
+            };
 
             requestQueue.add(request);
 

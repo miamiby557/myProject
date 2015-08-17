@@ -79,7 +79,7 @@ public class OtdCarrierOrderDetail{
         this.otdCarrierOrder = otdCarrierOrder;
     }
 
-    @Override
+    /*@Override
     public String toString() {
         return "OtdCarrierOrderDetail{" +
                 "carrierOrderDetailId=" + carrierOrderDetailId +
@@ -91,5 +91,5 @@ public class OtdCarrierOrderDetail{
                 ", confirmedWeight=" + confirmedWeight +
                 ", otdCarrierOrder=" + otdCarrierOrder +
                 '}';
-    }
+    }*/
 }

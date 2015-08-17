@@ -1,9 +1,11 @@
 package com.lnet.tmsapp.util;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,8 +15,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.lnet.tmsapp.R;
-import com.lnet.tmsapp.TransportOrderDetailActivity;
-import com.lnet.tmsapp.model.OtdTransportOrder;
 
 import java.util.List;
 
@@ -25,19 +25,18 @@ public class ListAdapter extends BaseAdapter {
     private List<DataItem> list;
     private Context context;
     private int layout;
-    Intent intent;
-    Activity activity;
-    Class c;
+    FragmentActivity activity;
+    Fragment fragment;
 
     private LayoutInflater inflater;
 
-    public ListAdapter(Activity activity,Class c,List<DataItem> list, Context context,int layout)
+    public ListAdapter(FragmentActivity activity,Fragment fragment,List<DataItem> list, Context context,int layout)
     {
         this.list = list;
         this.context = context;
         this.layout = layout;
         this.activity = activity;
-        this.c = c;
+        this.fragment = fragment;
 
         inflater =(LayoutInflater)context.getSystemService(context.LAYOUT_INFLATER_SERVICE);
     }
@@ -76,23 +75,24 @@ public class ListAdapter extends BaseAdapter {
             cache.info=(TextView)convertView.findViewById(R.id.info);
             cache.viewBtn=(Button)convertView.findViewById(R.id.view_btn);
             convertView.setTag(cache);
-
         }
         else
         {
             cache=(ViewHolder)convertView.getTag();
         }
-
         final DataItem item=list.get(position);
         cache.info.setText(item.getTextName());
         cache.viewBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                intent = new Intent(activity,c);
+                FragmentManager fragmentManager =activity.getSupportFragmentManager();
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
                 Bundle bundle = new Bundle();
                 bundle.putString("id", item.getTextValue());
-                intent.putExtras(bundle);
-                activity.startActivity(intent);
+                fragment.setArguments(bundle);
+                fragmentTransaction.replace(R.id.container_body, fragment);
+                fragmentTransaction.addToBackStack(null);
+                fragmentTransaction.commit();
             }
         });
         return convertView;

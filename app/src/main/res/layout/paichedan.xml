@@ -1,34 +1,223 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:background="#fff0f0f0" >
+    android:orientation="vertical"
+    android:background="@android:color/background_light"
+    >
 
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:orientation="vertical"
-        android:paddingBottom="10.0dip"
-        >
+        android:id="@+id/linear_layout">
+
+
 
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:focusable="false"
-            android:focusableInTouchMode="false"
-            android:orientation="vertical"
-            android:id="@+id/linelayout1"
-            android:gravity="center">
+            android:orientation="vertical">
 
-            <TextView
+            <LinearLayout
                 android:layout_width="fill_parent"
-                android:layout_height="100dp"
-                android:text="功能正在开发，请留意官方更新版本！"
-                android:id="@+id/textView19"
-                android:gravity="center"
-                android:textSize="20dp"
-                android:textColor="@android:color/holo_purple" />
+                android:layout_height="fill_parent"
+                android:orientation="vertical">
+                <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:id="@+id/t_scrollview" android:background="@android:color/background_light"
+                    android:layout_marginBottom="3dp">
+                    <LinearLayout
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+                        <LinearLayout
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content">
 
+                            <EditText
+                                android:layout_width="250dp"
+                                android:layout_height="wrap_content"
+                                android:id="@+id/input_number"
+                                android:hint="输入运输单号" android:drawableRight="@drawable/scaning"
+                                android:inputType="textVisiblePassword" />
+
+                            <Button
+                                android:layout_width="fill_parent"
+                                android:layout_height="wrap_content"
+                                android:id="@+id/add_order"
+                                android:text="添加" />
+                        </LinearLayout>
+                        <LinearLayout
+                            android:orientation="horizontal"
+                            android:layout_width="fill_parent"
+                            android:layout_height="fill_parent"
+                            android:gravity="center">
+
+                            <TableLayout
+                                android:id="@+id/add_transportorder_table"
+                                android:layout_width="fill_parent"
+                                android:layout_height="fill_parent"
+                                >
+                                <TableRow android:background="@android:color/holo_purple"
+                                    android:layout_height="fill_parent" android:layout_width="fill_parent">
+                                    <TextView
+                                        android:layout_width="100dp"
+                                        android:text="单号"
+                                        android:layout_height="40dp"
+                                        android:layout_gravity="center_horizontal"
+                                        android:gravity="center" />
+
+                                    <TextView
+                                        android:layout_width="70dp"
+                                        android:text="体积/m³"
+                                        android:id="@+id/textView5"
+                                        android:gravity="center"
+                                        android:layout_gravity="center_horizontal"
+                                        android:layout_height="40dp" />
+                                    <TextView
+                                        android:text="重量/kg"
+                                        android:layout_width="100dp"
+                                        android:layout_height="40dp"
+                                        android:gravity="center" />
+                                    <TextView
+                                        android:text="操作"
+                                        android:layout_width="100dp"
+                                        android:layout_height="fill_parent"
+                                        android:layout_gravity="center_horizontal"
+                                        android:gravity="center" />
+                                </TableRow>
+                            </TableLayout>
+                        </LinearLayout>
+                        <LinearLayout
+                            android:orientation="vertical"
+                            android:layout_width="fill_parent"
+                            android:layout_height="fill_parent"
+                            android:layout_marginLeft="20dp"
+                            android:layout_marginTop="5dp"
+                            android:layout_marginBottom="5dp"
+                            android:layout_marginRight="20dp"
+                            android:id="@+id/line">
+                            <LinearLayout
+                                android:orientation="horizontal"
+                                android:layout_width="fill_parent"
+                                android:layout_height="fill_parent">
+
+                                <!--<EditText
+                                    android:layout_width="fill_parent"
+                                    android:layout_height="fill_parent"
+                                    android:id="@+id/car_number"
+                                    android:hint="输入车牌号"
+                                    android:inputType="text" />-->
+
+
+                                <!--<AutoCompleteTextView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:id="@+id/car_number"
+                                    android:hint="输入车牌号"
+                                    />-->
+
+
+                                <Spinner
+                                    android:layout_width="fill_parent"
+                                    android:layout_height="70dp"
+                                    android:id="@+id/cars" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:orientation="horizontal"
+                                android:layout_width="fill_parent"
+                                android:layout_height="fill_parent">
+
+                                <EditText
+                                    android:layout_width="fill_parent"
+                                    android:layout_height="fill_parent"
+                                    android:drawablePadding="15dp"
+                                    android:id="@+id/driver"
+                                    android:hint="司机"
+                                    android:inputType="text" />
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:orientation="horizontal"
+                                android:layout_width="fill_parent"
+                                android:layout_height="fill_parent">
+
+                                <EditText
+                                    android:layout_width="fill_parent"
+                                    android:layout_height="wrap_content"
+                                    android:id="@+id/driver_phone"
+                                    android:hint="司机电话"
+                                    android:inputType="phone" />
+
+                            </LinearLayout>
+                            <LinearLayout
+                                android:orientation="horizontal"
+                                android:layout_width="fill_parent"
+                                android:layout_height="fill_parent">
+
+                                <EditText
+                                    android:layout_width="fill_parent"
+                                    android:layout_height="wrap_content"
+                                    android:id="@+id/fee"
+                                    android:hint="费用"
+                                    android:inputType="numberDecimal" />
+
+                            </LinearLayout>
+                            <LinearLayout
+                                android:orientation="horizontal"
+                                android:layout_width="fill_parent"
+                                android:layout_height="fill_parent">
+
+                                <EditText
+                                    android:layout_width="fill_parent"
+                                    android:layout_height="100dp"
+                                    android:id="@+id/start_place"
+                                    android:hint="起始地址"
+                                    android:inputType="text"
+                                    android:gravity="top" />
+
+                            </LinearLayout>
+                            <LinearLayout
+                                android:orientation="horizontal"
+                                android:layout_width="fill_parent"
+                                android:layout_height="fill_parent">
+
+                                <EditText
+                                    android:layout_width="fill_parent"
+                                    android:layout_height="100dp"
+                                    android:id="@+id/end_place"
+                                    android:hint="目的地址"
+                                    android:inputType="text"
+                                    android:gravity="top" />
+
+                            </LinearLayout>
+                            <LinearLayout
+                                android:orientation="horizontal"
+                                android:layout_width="fill_parent"
+                                android:layout_height="fill_parent">
+
+                                <EditText
+                                    android:layout_width="fill_parent"
+                                    android:layout_height="100dp"
+                                    android:id="@+id/remark"
+                                    android:hint="备注"
+                                    android:inputType="text"
+                                    android:gravity="top" />
+
+                            </LinearLayout>
+
+
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+                </ScrollView>
+
+            </LinearLayout>
         </LinearLayout>
     </LinearLayout>
-</RelativeLayout>
+</LinearLayout>

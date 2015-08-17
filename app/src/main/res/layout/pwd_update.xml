@@ -56,6 +56,19 @@
                 android:textColor="#ffffffff"
                 android:textSize="18.0sp"
                 android:layout_marginTop="12dp" />
+
+            <Button
+                android:id="@+id/button_cancel"
+                android:layout_width="fill_parent"
+                android:layout_height="50.0dip"
+                android:layout_marginLeft="12.0dip"
+                android:layout_marginRight="12.0dip"
+                android:background="@android:color/darker_gray"
+                android:singleLine="false"
+                android:text="取消"
+                android:textColor="#ffffffff"
+                android:textSize="18.0sp"
+                android:layout_marginTop="12dp" />
         </LinearLayout>
     </LinearLayout>
 </RelativeLayout>

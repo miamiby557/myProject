@@ -37,20 +37,7 @@
         <activity android:name=".LoginActivity"
             android:screenOrientation="portrait" >
         </activity>
-        <activity android:name=".MainActivity"
-            android:screenOrientation="portrait" >
-        </activity>
         <activity android:name=".ServiceConfigActivity" android:label="服务器配置"
-            android:windowSoftInputMode="adjustUnspecified|stateHidden"
-            android:theme="@android:style/Theme.Holo.Light"
-            android:screenOrientation="portrait">
-        </activity>
-        <activity android:name=".TransportOrderActivity" android:label="运输订单创建"
-            android:windowSoftInputMode="adjustUnspecified|stateHidden"
-            android:theme="@android:style/Theme.Holo.Light"
-            android:screenOrientation="portrait">
-        </activity>
-        <activity android:name=".CarrierOrderActivity" android:label="托运单创建"
             android:windowSoftInputMode="adjustUnspecified|stateHidden"
             android:theme="@android:style/Theme.Holo.Light"
             android:screenOrientation="portrait">
@@ -68,51 +55,16 @@
             android:screenOrientation="portrait">
         </activity>
 
-        <activity android:name=".TransportOrderListActivity" android:label="我的运输单"
+        <activity android:name=".CarrierOrderAddOtherActivity" android:label="完善托运单"
             android:windowSoftInputMode="adjustUnspecified|stateHidden"
-            android:theme="@android:style/Theme.Holo.Light"
             android:screenOrientation="portrait">
         </activity>
 
-        <activity android:name=".CarrierOrderListActivity" android:label="我的托运单"
-            android:windowSoftInputMode="adjustUnspecified|stateHidden"
-            android:theme="@android:style/Theme.Holo.Light"
-            android:screenOrientation="portrait">
-        </activity>
-        <activity android:name=".CarSendActivity" android:label="发车确认"
-            android:windowSoftInputMode="adjustUnspecified|stateHidden"
-            android:theme="@android:style/Theme.Holo.Light"
-            android:screenOrientation="portrait">
-        </activity>
-        <activity android:name=".CarBackActivity" android:label="回场确认"
-            android:windowSoftInputMode="adjustUnspecified|stateHidden"
-            android:theme="@android:style/Theme.Holo.Light"
-            android:screenOrientation="portrait">
-        </activity>
-        <activity android:name=".CarrierOrderAddOtherActivity" android:label="完善托运单"
-            android:windowSoftInputMode="adjustUnspecified|stateHidden"
-            android:theme="@android:style/Theme.Holo.Light"
-            android:screenOrientation="portrait">
-        </activity>
-        <activity android:name=".PaichedanActivity" android:label="我的派车单"
-            android:windowSoftInputMode="adjustUnspecified|stateHidden"
-            android:theme="@android:style/Theme.Holo.Light"
-            android:screenOrientation="portrait">
-        </activity>
-        <activity android:name=".PWDUpdateActivity" android:label="修改密码"
-            android:windowSoftInputMode="adjustUnspecified|stateHidden"
-            android:theme="@android:style/Theme.Holo.Light"
-            android:screenOrientation="portrait">
-        </activity>
-        <activity android:name=".TransportOrderDetailActivity" android:label="运输单明细"
-            android:windowSoftInputMode="adjustUnspecified|stateHidden"
-            android:theme="@android:style/Theme.Holo.Light"
-            android:screenOrientation="portrait">
-        </activity>
-        <activity android:name=".CarrierOrderDetailActivity" android:label="托运单明细"
-            android:windowSoftInputMode="adjustUnspecified|stateHidden"
-            android:theme="@android:style/Theme.Holo.Light"
-            android:screenOrientation="portrait">
+        <activity
+            android:name=".second.andy.materialdesign.MainActivity"
+            android:theme="@style/MyMaterialTheme"
+            android:screenOrientation="portrait"
+            android:label="@string/app_name" >
         </activity>
     </application>
 
