@@ -28,7 +28,7 @@ import com.google.zxing.MultiFormatReader;
 import com.google.zxing.ReaderException;
 import com.google.zxing.Result;
 import com.google.zxing.common.HybridBinarizer;
-import com.lnet.tmsapp.CaptureActivity;
+import com.lnet.tmsapp.second.version.core.CaptureActivity;
 import com.lnet.tmsapp.R;
 import com.lnet.tmsapp.camera.CameraManager;
 import com.lnet.tmsapp.camera.PlanarYUVLuminanceSource;

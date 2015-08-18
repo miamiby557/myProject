@@ -27,7 +27,7 @@ import android.util.Log;
 
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.Result;
-import com.lnet.tmsapp.CaptureActivity;
+import com.lnet.tmsapp.second.version.core.CaptureActivity;
 import com.lnet.tmsapp.R;
 import com.lnet.tmsapp.camera.CameraManager;
 import com.lnet.tmsapp.view.ViewfinderResultPointCallback;
