@@ -76,12 +76,10 @@ public class OtdTransportOrder {
         this.receiveAddress = receiveAddress;
     }
 
-    public void update(String clientOrderNumber, UUID clientId, UUID destCityId, Double totalVolume, Double totalWeight,UUID createUserId) {
+    public void update(String clientOrderNumber, UUID clientId, UUID destCityId, UUID createUserId) {
         this.clientOrderNumber = clientOrderNumber;
         this.clientId = clientId;
         this.destCityId = destCityId;
-        this.totalVolume = totalVolume;
-        this.totalWeight = totalWeight;
         this.createUserId = createUserId;
         this.modifyDate = DateUtils.getTimestampNow();
         this.createDate = DateUtils.getTimestampNow();

@@ -76,4 +76,21 @@ public class DataUtils {
         return items;
     }
 
+    public static List<DataItem> getWrapType(){
+        List<DataItem> items = new ArrayList<>();
+        DataItem item1 = new DataItem("1","原包装");
+        DataItem item2 = new DataItem("1","纸箱");
+        DataItem item3 = new DataItem("1","木架");
+        DataItem item4 = new DataItem("1","木柜");
+        DataItem item5 = new DataItem("1","铁桶");
+        DataItem item6 = new DataItem("1","膜");
+        items.add(item1);
+        items.add(item2);
+        items.add(item3);
+        items.add(item4);
+        items.add(item5);
+        items.add(item6);
+        return items;
+    }
+
 }

@@ -58,13 +58,19 @@
                     android:layout_height="fill_parent">
 
                     <EditText
-                        android:layout_width="fill_parent"
-                        android:layout_height="fill_parent"
+                        android:layout_width="250dp"
+                        android:layout_height="wrap_content"
                         android:drawableRight="@drawable/scaning"
                         android:drawablePadding="15dp"
                         android:id="@+id/t_number"
                         android:hint="输入客户单号"
                         android:inputType="text" />
+
+                    <Button
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="检查"
+                        android:id="@+id/check" />
 
                 </LinearLayout>
 
@@ -261,7 +267,7 @@
                             <EditText
                                 android:layout_width="fill_parent"
                                 android:layout_height="100dp"
-                                android:id="@+id/t_receiveManAddress" android:inputType="text"
+                                android:id="@+id/t_receiveManAddress" android:inputType="text|textMultiLine"
                                 android:hint="收货人地址"
                                 android:gravity="top" />
                         </LinearLayout>

@@ -48,7 +48,7 @@
                                 android:layout_height="fill_parent"
                                 android:gravity="right">
                                 <EditText
-                                    android:layout_width="230dp"
+                                    android:layout_width="fill_parent"
                                     android:layout_height="fill_parent"
                                     android:drawableRight="@drawable/scaning"
                                     android:drawablePadding="15dp"
@@ -56,51 +56,20 @@
                                     android:hint="输入单号"
                                     android:inputType="textVisiblePassword"
                                     android:layout_gravity="left" />
-                                <Button
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="增加费用申报"
-                                    android:id="@+id/add_fee_declare" />
                             </LinearLayout>
 
                             <LinearLayout
                                 android:orientation="horizontal"
                                 android:layout_width="fill_parent"
-                                android:layout_height="fill_parent">
-
-                                <TableLayout
-                                    android:id="@+id/add_fee_declare_table"
+                                android:layout_height="fill_parent"
+                                android:gravity="right">
+                                <EditText
                                     android:layout_width="fill_parent"
                                     android:layout_height="fill_parent"
-                                    >
-                                    <TableRow android:background="@android:color/holo_purple"
-                                        android:layout_height="fill_parent" android:layout_width="fill_parent"
-                                        android:layout_gravity="center_horizontal"
-                                        android:gravity="center">
-                                        <TextView
-                                            android:layout_width="100dp"
-                                            android:text="费用科目"
-                                            android:layout_height="40dp"
-                                            android:layout_gravity="left"
-                                            android:gravity="center" />
-
-                                        <TextView
-                                            android:layout_width="70dp"
-                                            android:text="申报金额"
-                                            android:id="@+id/textView5"
-                                            android:gravity="center"
-                                            android:layout_height="40dp"
-                                            android:layout_gravity="center" />
-
-                                        <TextView
-                                            android:text="操作"
-                                            android:layout_width="100dp"
-                                            android:layout_height="fill_parent"
-                                            android:gravity="center"
-                                            android:layout_gravity="center" />
-                                    </TableRow>
-                                </TableLayout>
-
+                                    android:drawablePadding="15dp"
+                                    android:id="@+id/signup_person"
+                                    android:hint="签收人"
+                                    android:layout_gravity="left" />
                             </LinearLayout>
                             <LinearLayout
                                 android:orientation="horizontal"
@@ -113,10 +82,8 @@
                                     android:drawablePadding="15dp"
                                     android:id="@+id/remark"
                                     android:hint="备注"
-                                    android:gravity="top"
-                                    android:layout_marginTop="10dp" />
+                                    android:gravity="top" />
                             </LinearLayout>
-
                             <LinearLayout
                                 android:layout_width="fill_parent"
                                 android:layout_height="wrap_content"

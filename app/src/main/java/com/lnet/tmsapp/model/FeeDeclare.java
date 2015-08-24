@@ -9,6 +9,7 @@ import java.util.List;
  */
 public class FeeDeclare {
     private List<DataItem> feeDeclares;
+    private String remark;
     private String imagesString;
     private String declareOrderNumber;
 
@@ -34,5 +35,13 @@ public class FeeDeclare {
 
     public void setDeclareOrderNumber(String declareOrderNumber) {
         this.declareOrderNumber = declareOrderNumber;
+    }
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
     }
 }

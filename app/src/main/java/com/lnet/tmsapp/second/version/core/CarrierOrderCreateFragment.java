@@ -13,7 +13,9 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.text.Editable;
 import android.text.InputType;
+import android.text.TextWatcher;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -28,6 +30,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TableLayout;
@@ -50,6 +53,7 @@ import com.lnet.tmsapp.model.FeeOrderPayables;
 import com.lnet.tmsapp.model.HttpArrayHelper;
 import com.lnet.tmsapp.model.OtdCarrierOrderBean;
 import com.lnet.tmsapp.model.OtdCarrierOrderDetail;
+import com.lnet.tmsapp.model.OtdCarrierOrderDetailView;
 import com.lnet.tmsapp.model.ServiceResult;
 import com.lnet.tmsapp.util.ArrayAdapterUtils;
 import com.lnet.tmsapp.util.DataItem;
@@ -62,6 +66,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -77,20 +83,28 @@ public class CarrierOrderCreateFragment extends Fragment {
     Button calculateButton;
     Button addTransButton;
     Button additionOther;
+    Button changeStartCity;
+    Button changeDestCity;
+    LinearLayout startCityLine;
+    LinearLayout destCityLine;
     Spinner carrierId;
     EditText carrierIdValue;
     EditText carrierOrderNumber;
     String number;
+    Button check;
     Spinner province1;
     Spinner province2;
     Spinner startCity;
     EditText startCityIdValue;
     Spinner destCity;
     EditText destCityIdValue;
-    EditText totalVolume;
-    EditText totalWeight;
-    EditText totalItemQuantity;
-    EditText totalPackageQuantity;
+    TextView startCityString;
+    TextView destCityString;
+    TextView totalVolume;
+    TextView totalWeight;
+    TextView totalItemQuantity;
+    TextView totalPackageQuantity;
+    TextView receivePageNumber;
     Spinner transportType;
     EditText transportTypeValue;
     Spinner calculateType;
@@ -99,17 +113,18 @@ public class CarrierOrderCreateFragment extends Fragment {
     EditText addOrderNumber;
     TableLayout transportOrderTable;
     TableLayout calculate_Table;
-    int rowId=0;
+    int num = 100;
     ScrollView activity_main;
     ProgressDialog progressDialog;
     List<String> numbers = new ArrayList<>();
     Set<OtdCarrierOrderDetail> details;
+    Set<OtdCarrierOrderDetailView> detailViews;
     OtdCarrierOrderBean otdCarrierOrderBean = new OtdCarrierOrderBean();
     Set<FeeOrderPayableJson> payableJsons;
     ApplicationTrans application;
     SharedPreferences mySharedPreferences;
 
-    OtdCarrierOrderBean orderAddMore;
+    OtdCarrierOrderBean orderAddMore = new OtdCarrierOrderBean();
 
     ProgressDialog loading;
 
@@ -163,25 +178,60 @@ public class CarrierOrderCreateFragment extends Fragment {
         mySharedPreferences = getActivity().getSharedPreferences(application.getFILENAME(), application.getMODE());
         requestQueue = Volley.newRequestQueue(getActivity().getApplicationContext());
         details=new HashSet<>();
+        detailViews = new HashSet<>();
         payableJsons = new HashSet<>();
         calculateButton = (Button)rootView.findViewById(R.id.c_calculate);
         addTransButton = (Button)rootView.findViewById(R.id.add_transorder);
         additionOther = (Button)rootView.findViewById(R.id.addition);
+        changeStartCity = (Button)rootView.findViewById(R.id.change_start_city);
+        startCityLine = (LinearLayout)rootView.findViewById(R.id.start_city_line);
+        destCityLine = (LinearLayout)rootView.findViewById(R.id.dest_city_line);
+        changeStartCity.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(View.VISIBLE != startCityLine.getVisibility()){
+                    startCityLine.setVisibility(View.VISIBLE);
+                }else {
+                    startCityLine.setVisibility(View.GONE);
+                }
+            }
+        });
+        changeDestCity = (Button)rootView.findViewById(R.id.change_dest_city);
+        changeDestCity.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(View.VISIBLE != destCityLine.getVisibility()){
+                    destCityLine.setVisibility(View.VISIBLE);
+                }else {
+                    destCityLine.setVisibility(View.GONE);
+                }
+            }
+        });
+
         carrierId = (Spinner)rootView.findViewById(R.id.spinner_carrier);
         carrierIdValue = new EditText(getActivity().getApplicationContext());
         carrierOrderNumber = (EditText)rootView.findViewById(R.id.c_number);
         carrierOrderNumber.setOnTouchListener(new CarrierOrderTouchEvent());
-        carrierOrderNumber.setOnFocusChangeListener(new FocusListener());
+        check = (Button)rootView.findViewById(R.id.check);
+        check.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                checkNumber(carrierOrderNumber.getText().toString().trim());
+            }
+        });
         province1 = (Spinner)rootView.findViewById(R.id.c_province1);
         province2 = (Spinner)rootView.findViewById(R.id.c_province2);
         startCity = (Spinner)rootView.findViewById(R.id.c_start_city);
         startCityIdValue = new EditText(getActivity().getApplicationContext());
         destCity = (Spinner)rootView.findViewById(R.id.c_dest_city);
         destCityIdValue = new EditText(getActivity().getApplicationContext());
-        totalItemQuantity = (EditText)rootView.findViewById(R.id.totalItemQuantity);
-        totalPackageQuantity = (EditText)rootView.findViewById(R.id.totalPackageQuantity);
-        totalVolume = (EditText)rootView.findViewById(R.id.totalVolume);
-        totalWeight = (EditText)rootView.findViewById(R.id.totalWeight);
+        startCityString = (TextView)rootView.findViewById(R.id.startCity);
+        destCityString = (TextView)rootView.findViewById(R.id.destCity);
+        totalItemQuantity = new TextView(getActivity().getApplicationContext());
+        totalPackageQuantity = (TextView)rootView.findViewById(R.id.total_package_count);
+        totalVolume = (TextView)rootView.findViewById(R.id.total_volume);
+        receivePageNumber = (TextView)rootView.findViewById(R.id.receive_page_count);
+        totalWeight = (TextView)rootView.findViewById(R.id.total_weight);
         transportType = (Spinner)rootView.findViewById(R.id.c_transportType);
         transportTypeValue = new EditText(getActivity().getApplicationContext());
         calculateType = (Spinner)rootView.findViewById(R.id.c_calculateType);
@@ -386,10 +436,6 @@ public class CarrierOrderCreateFragment extends Fragment {
             showMassage("目的城市为空!");
             return;
         }
-        /*if(!check(totalItemQuantity.getText().toString().trim())) {
-            showMassage("数量为空!");
-            return;
-        }*/
         if(!check(totalPackageQuantity.getText().toString().trim())) {
             showMassage("件数为空!");
             return;
@@ -415,15 +461,6 @@ public class CarrierOrderCreateFragment extends Fragment {
             return;
         }
 
-        //更新费用数据
-        for (int i = 0; i < payableJsons.size(); i++) {
-            EditText text = (EditText)rootView.findViewById(i + 100);
-            for (FeeOrderPayableJson json : payableJsons) {
-                if (i + 100 == json.getIndex()) {
-                    json.setExacctMoney(new Double(text.getText().toString().trim()));
-                }
-            }
-        }
         createCarrierOrder();
     }
 
@@ -436,17 +473,28 @@ public class CarrierOrderCreateFragment extends Fragment {
                 otdCarrierOrderBean.setStartCityId(UUID.fromString(cityId));
             }
         }
+        /*for(OtdCarrierOrderDetail detail:details){
+            OtdCarrierOrderDetailView detailView = new OtdCarrierOrderDetailView();
+            detailView.setTransportOrderId(detail.getTransportOrderId());
+            detailView.setReceiptPageNumber(detail.getReceivePageNumber());
+            detailViews.add(detailView);
+        }*/
+        otdCarrierOrderBean.setDetails(details);
+        otdCarrierOrderBean.setSendDate(new Date());
+        otdCarrierOrderBean.setDetailViews(detailViews);
         final Gson gson = JsonHelper.getGson();
         String httpUrl = mySharedPreferences.getString("serviceAddress", "") + "/order/carrierOrderCreate";
         final ProgressDialog createCarrierOrderProgressDialog = ProgressDialog.show(getActivity(), "提示", "...创建中...");
-        otdCarrierOrderBean.setDetails(details);
-        otdCarrierOrderBean.setSendDate(new Date());
         String json = gson.toJson(otdCarrierOrderBean);
         GsonRequest<ServiceResult> gsonRequest = new GsonRequest(httpUrl, ServiceResult.class, json, new Response.Listener<ServiceResult>() {
             @Override
             public void onResponse(ServiceResult response) {
                 if (createCarrierOrderProgressDialog.isShowing() && createCarrierOrderProgressDialog != null) {
                     createCarrierOrderProgressDialog.dismiss();
+                }
+                if(!response.isSuccess()){
+                    showMassage("此单号已存在!");
+                    return;
                 }
                 details.clear();
                 Map<String, String> map = (Map<String, String>) response.getContent();
@@ -520,6 +568,7 @@ public class CarrierOrderCreateFragment extends Fragment {
         }
         progressDialog = ProgressDialog.show(getActivity(), "提示", "...提取运输订单中...");
         //从数据库得到运输订单
+
         String httpUrl = mySharedPreferences.getString("serviceAddress", "")+"/order/transportOrder/"+orderNumber;
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, httpUrl,
                 new Response.Listener<JSONObject>() {
@@ -541,16 +590,50 @@ public class CarrierOrderCreateFragment extends Fragment {
                                     JSONObject content = response.getJSONObject("content");
                                     String clientOrderNumber = content.getString("clientOrderNumber");
                                     String transportOrderId = content.getString("transportOrderId");
-                                    Double totalVolume = content.getDouble("totalVolume");
-                                    Double totalWeight = content.getDouble("totalWeight");
+                                    double totalVolume = content.getDouble("totalVolume");
+                                    double totalWeight = content.getDouble("totalWeight");
+                                    int totalItemQuantity = content.getInt("totalItemQuantity");
+                                    int totalPackageQuantity = content.getInt("totalPackageQuantity");
+                                    String startCityId = content.getString("startCityId");
+                                    String destCityId = content.getString("destCityId");
+
+                                    if(!check(startCityIdValue.getText().toString())){
+                                        startCityIdValue.setText(startCityId);
+                                    }
+                                    if(!check(destCityIdValue.getText().toString())){
+                                        destCityIdValue.setText(destCityId);
+                                    }
+
+                                    if(orderAddMore!=null&&orderAddMore.getConsignee()==null){
+                                        String receiveMan = content.getString("receiveMan");
+                                        String receiveManPhone = content.getString("receivePhone");
+                                        String receiveManAddress = content.getString("receiveAddress");
+                                        orderAddMore.update(receiveMan,receiveManPhone,receiveManAddress);
+
+                                    }
+
                                     OtdCarrierOrderDetail detail = new OtdCarrierOrderDetail();
                                     detail.setTransportOrderId(UUID.fromString(transportOrderId));
                                     detail.setConfirmedVolume(totalVolume);
                                     detail.setConfirmedWeight(totalWeight);
+                                    detail.setConfirmedItemQuantity(totalItemQuantity);
+                                    detail.setConfirmedPackageQuantity(totalPackageQuantity);
+                                    detail.setReceivePageNumber(0);
                                     details.add(detail);
+                                    OtdCarrierOrderDetailView detailView = new OtdCarrierOrderDetailView();
+                                    detailView.setTransportOrderId(detail.getTransportOrderId());
+                                    detailView.setReceiptPageNumber(detail.getReceivePageNumber());
+                                    detailViews.add(detailView);
                                     numbers.add(clientOrderNumber);
-                                    addTransportOrder(transportOrderTable, clientOrderNumber, totalVolume, totalWeight, detail);
+                                    if(!check(startCityString.getText().toString())){
+                                        String startCity = content.getString("startCity");
+                                        startCityString.setText("当前始发城市:"+startCity);
+                                        String destCity = content.getString("destCity");
+                                        destCityString.setText("当前目的城市:"+destCity);
+                                    }
+                                    addTransportOrder(transportOrderTable, clientOrderNumber, totalVolume, totalWeight, totalItemQuantity, totalPackageQuantity, 0, detail,detailView);
                                     showToast("添加运输单成功!");
+                                    updateUI(totalVolume,totalWeight,totalItemQuantity,totalPackageQuantity,0);
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                     showMassage("此单某些数据不完整!");
@@ -574,6 +657,32 @@ public class CarrierOrderCreateFragment extends Fragment {
         requestQueue.add(request);
     }
 
+    private void updateUI(double tVolume, double tWeight, int tItemQuantity, int tPackageQuantity, int receiptPNumber) {
+        String num1 = totalVolume.getText().toString();
+        totalVolume.setText(add(num1, tVolume) + "");
+        String num2 = totalWeight.getText().toString();
+        totalWeight.setText(add(num2, tWeight) + "");
+        String num3 = totalItemQuantity.getText().toString();
+        totalItemQuantity.setText(add(num3,tItemQuantity)+"");
+        String num4 = totalPackageQuantity.getText().toString();
+        totalPackageQuantity.setText(add(num4,tPackageQuantity)+"");
+        String num5 = receivePageNumber.getText().toString();
+        receivePageNumber.setText(add(num5, receiptPNumber) + "");
+    }
+
+    private double add(String x, double y){
+        BigDecimal add1 = new BigDecimal(x);
+        BigDecimal add2 = new BigDecimal(y+"");
+        return  add1.add(add2).doubleValue() ;
+    }
+
+    private int add(String x,int i){
+        if(x.length()==0){
+           return i;
+        }
+        return Integer.parseInt(x)+i;
+    }
+
     private void calculateOrder(){
         //判断必需数据
         if(!check(carrierIdValue.getText().toString())){
@@ -588,10 +697,6 @@ public class CarrierOrderCreateFragment extends Fragment {
             showMassage("目的城市为空!");
             return;
         }
-        /*if(!check(totalItemQuantity.getText().toString().trim())) {
-            showMassage("数量为空!");
-            return;
-        }*/
         if(!check(totalPackageQuantity.getText().toString().trim())) {
             showMassage("件数为空!");
             return;
@@ -632,20 +737,30 @@ public class CarrierOrderCreateFragment extends Fragment {
         otdCarrierOrderBean.update(UUID.fromString(carrierIdValue.getText().toString()),
                 UUID.fromString(destCityIdValue.getText().toString()),
                 carrierOrderNumber.getText().toString(), Integer.parseInt(calculateTypeValue.getText().toString()),
-                Integer.parseInt(transportTypeValue.getText().toString()), UUID.fromString(userId), Integer.parseInt(totalPackageQuantity.getText().toString().trim()),
-                new Double(totalVolume.getText().toString().trim()), new Double(totalWeight.getText().toString().trim()),
+                Integer.parseInt(transportTypeValue.getText().toString()), UUID.fromString(userId),
                 isUpstairs.isChecked() ? true : false);
-        otdCarrierOrderBean.setTotalItemQuantity(Integer.parseInt(totalItemQuantity.getText().toString().trim()));
+        if(check(totalItemQuantity.getText().toString().trim())){
+            otdCarrierOrderBean.setTotalItemQuantity(Integer.parseInt(totalItemQuantity.getText().toString().trim()));
+        }else{
+            otdCarrierOrderBean.setTotalItemQuantity(0);
+        }
+        otdCarrierOrderBean.setTotalVolume(new Double(totalVolume.getText().toString()));
+        otdCarrierOrderBean.setTotalWeight(new Double(totalWeight.getText().toString()));
+        otdCarrierOrderBean.setTotalItemQuantity(Integer.parseInt(totalItemQuantity.getText().toString()));
+        otdCarrierOrderBean.setTotalPackageQuantity(Integer.parseInt(totalPackageQuantity.getText().toString()));
+        otdCarrierOrderBean.setReceiptPageNumber(Integer.parseInt(receivePageNumber.getText().toString()));
         Map map = JsonHelper.toMap(otdCarrierOrderBean);
         String httpUrl = mySharedPreferences.getString("serviceAddress","")+"/order/calculate";
         HttpArrayHelper httpHelper = new HttpArrayHelper(application,getActivity(),requestQueue,calculateDialog) {
             @Override
             public void onResponse(JSONArray response) {
+                BigDecimal decimal = new BigDecimal(0);
                 for(int i =0;i<response.length();i++){
                     try {
                         JSONObject object = response.getJSONObject(i);
                         String exacctName = object.getString("exacctName");
-                        Double exacctMoney = object.getDouble("exacctMoney");
+                        double exacctMoney = object.getDouble("exacctMoney");
+                        decimal = decimal.add(new BigDecimal(exacctMoney));
                         String exacctId = object.getString("exacctId");
                         FeeOrderPayableJson json = new FeeOrderPayableJson(i+100,exacctName,exacctMoney,exacctId);
                         payableJsons.add(json);
@@ -656,6 +771,7 @@ public class CarrierOrderCreateFragment extends Fragment {
                 for(FeeOrderPayableJson json:payableJsons){
                     addResult(calculate_Table,json);
                 }
+                addEndResult(calculate_Table, decimal);
                 if (calculateDialog.isShowing() && calculateDialog != null) {
                     calculateDialog.dismiss();
                 }
@@ -671,51 +787,200 @@ public class CarrierOrderCreateFragment extends Fragment {
         httpHelper.post(httpUrl, new JSONObject(map));
     }
 
-    private void addTransportOrder(final TableLayout table, final String orderNumber,Double confirmedVolume,Double confirmedWeight, final OtdCarrierOrderDetail detail){
+    private void addTransportOrder(final TableLayout table, final String orderNumber,Double confirmedVolume,Double confirmedWeight,int totalItemQuantity,int totalPackageQuantity,int receiptPageNumber, final OtdCarrierOrderDetail detail, final OtdCarrierOrderDetailView detailView){
+
+        String id = detail.getTransportOrderId().toString();
         TableRow row = new TableRow(getActivity());
-        row.setId(rowId);
         TextView order = new TextView(getActivity());
         order.setText(orderNumber);
         order.setPadding(3, 3, 3, 3);
         order.setGravity(Gravity.CENTER);
 
-        TextView volume = new TextView(getActivity());
+        EditText volume = new EditText(getActivity());
+        int n1 = num++;
+        volume.setId(n1);
         volume.setText(confirmedVolume + "");
+        volume.setInputType(InputType.TYPE_CLASS_NUMBER|InputType.TYPE_NUMBER_FLAG_DECIMAL);
         volume.setPadding(3, 3, 3, 3);
         volume.setGravity(Gravity.CENTER);
 
-        TextView weight = new TextView(getActivity());
+        EditText weight = new EditText(getActivity());
+        int n2 = num++;
+        weight.setId(n2);
         weight.setText(confirmedWeight + "");
+        weight.setInputType(InputType.TYPE_CLASS_NUMBER|InputType.TYPE_NUMBER_FLAG_DECIMAL);
         weight.setPadding(3, 3, 3, 3);
         weight.setGravity(Gravity.CENTER);
+
+        /*EditText totalItemCount = new EditText(getActivity());
+        int n3 = num++;
+        totalItemCount.setId(n3);
+        totalItemCount.setText(totalItemQuantity + "");
+        totalItemCount.setInputType(InputType.TYPE_CLASS_NUMBER);
+        totalItemCount.setPadding(3, 3, 3, 3);
+        totalItemCount.setGravity(Gravity.CENTER);*/
+
+        EditText totalPackageCount = new EditText(getActivity());
+        int n4 = num++;
+        totalPackageCount.setId(n4);
+        totalPackageCount.setText(totalPackageQuantity + "");
+        totalPackageCount.setInputType(InputType.TYPE_CLASS_NUMBER);
+        totalPackageCount.setPadding(3, 3, 3, 3);
+        totalPackageCount.setGravity(Gravity.CENTER);
+
+        EditText pageNumber = new EditText(getActivity());
+        int n5 = num++;
+        pageNumber.setId(n5);
+        pageNumber.setText(receiptPageNumber + "");
+        pageNumber.setInputType(InputType.TYPE_CLASS_NUMBER);
+        pageNumber.setPadding(3, 3, 3, 3);
+        pageNumber.setGravity(Gravity.CENTER);
+
+        //spinner
+        final Spinner wrapType = new Spinner(getActivity().getApplicationContext());
+        ArrayAdapter<DataItem> mAdapter = new ArrayAdapter<>(getActivity().getApplicationContext(),R.layout.list_item2,DataUtils.getWrapType());
+        wrapType.setAdapter(mAdapter);
+        wrapType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                DataItem dataItem = (DataItem) wrapType.getSelectedItem();
+                detailView.setWrapType(Integer.parseInt(dataItem.getTextValue()));
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
 
         Button button = new Button(getActivity());
         button.setWidth(50);
         button.setHeight(40);
-        button.setId(rowId + 1000);
         button.setText("删除");
         button.setPadding(3, 3, 3, 3);
         button.setGravity(Gravity.CENTER);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                TableRow tableRow = (TableRow)v.getParent();
+                TableRow tableRow = (TableRow) v.getParent();
                 table.removeView(tableRow);
                 numbers.remove(orderNumber);
                 details.remove(detail);
+                updateUI(detail);
             }
         });
 
         row.addView(order);
         row.addView(volume);
         row.addView(weight);
+//        row.addView(totalItemCount);
+        row.addView(totalPackageCount);
+        row.addView(pageNumber);
+        row.addView(wrapType);
         row.addView(button);
 
         table.addView(row);
-        rowId++;
-        addOrderNumber.setText(null);
-        addOrderNumber.setHint("输入运输单号");
 
+        volume.addTextChangedListener(new TransportDetailChange(id, 2, n1));
+        weight.addTextChangedListener(new TransportDetailChange(id, 3, n2));
+//        totalItemCount.addTextChangedListener(new TransportDetailChange(id, 4, n3));
+        totalPackageCount.addTextChangedListener(new TransportDetailChange(id, 5, n4));
+        pageNumber.addTextChangedListener(new TransportDetailChange(id,6,n5));
+
+        addOrderNumber.setText(null);
+    }
+
+    private class TransportDetailChange implements TextWatcher{
+        private String oldValue;
+        private String id;
+        private int position;
+        int i;
+        public TransportDetailChange(String id, int position,int i) {
+            this.id = id;
+            this.position = position;
+            this.i = i;
+        }
+
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            oldValue = s.toString();
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+        }
+
+        @Override
+        public void afterTextChanged(Editable s) {
+            if(s.length()!=0){
+                String value = s.toString();
+                ProgressDialog update = ProgressDialog.show(getActivity(),"提示","更新中...");
+                for(OtdCarrierOrderDetail detail:details){
+                    if(detail.getTransportOrderId().toString().equalsIgnoreCase(id)){
+                        if(2 == position){
+                            String tVolume = totalVolume.getText().toString();
+                            double count = sub(tVolume,new Double(oldValue.length()==0?"0":oldValue));
+                            totalVolume.setText(add(value,count)+"");
+                            detail.setConfirmedVolume(new Double(value));
+                        }else if(3 == position){
+                            String tWeight = totalWeight.getText().toString();
+                            double count = sub(tWeight,new Double(oldValue.length()==0?"0":oldValue));
+                            totalWeight.setText(add(value,count)+"");
+                            detail.setConfirmedWeight(new Double(value));
+                        }else if(4 == position){
+                            String tItemCount = totalItemQuantity.getText().toString();
+                            int count = sub(tItemCount,Integer.parseInt(oldValue.length()==0?"0":oldValue));
+                            totalItemQuantity.setText(add(value,count)+"");
+                            detail.setConfirmedItemQuantity(Integer.parseInt(value));
+                        }
+                        else if(5 == position){
+                            String tPackageCount = totalPackageQuantity.getText().toString();
+                            int count = sub(tPackageCount,Integer.parseInt(oldValue.length() == 0 ? "0" : oldValue));
+                            totalPackageQuantity.setText(add(value,count)+"");
+                            detail.setConfirmedPackageQuantity(Integer.parseInt(value));
+                        }
+                        else if(6 == position){
+                            String receivePageCount = receivePageNumber.getText().toString();
+                            int count = sub(receivePageCount,Integer.parseInt(oldValue.length() == 0 ? "0" : oldValue));
+                            receivePageNumber.setText(add(value,count)+"");
+                            detail.setReceivePageNumber(Integer.parseInt(value));
+                        }
+                        if(update!=null&&update.isShowing()){
+                            update.dismiss();
+                        }
+                        break;
+                    }
+                }
+            }
+
+        }
+    }
+
+    private void updateUI(OtdCarrierOrderDetail detail) {
+        String num1 = totalVolume.getText().toString();
+        totalVolume.setText(sub(num1, detail.getConfirmedVolume()) + "");
+        String num2 = totalWeight.getText().toString();
+        totalWeight.setText(sub(num2, detail.getConfirmedWeight()) + "");
+        String num3 = totalItemQuantity.getText().toString();
+        totalItemQuantity.setText(sub(num3,detail.getConfirmedItemQuantity())+"");
+        String num4 = totalPackageQuantity.getText().toString();
+        totalPackageQuantity.setText(sub(num4,detail.getConfirmedPackageQuantity())+"");
+        String num5 = receivePageNumber.getText().toString();
+        receivePageNumber.setText(sub(num5, detail.getReceivePageNumber())+"");
+    }
+
+    private double sub(String x, double y){
+        BigDecimal add1 = new BigDecimal(x);
+        if(add1.equals(BigDecimal.ZERO)){
+           return new Double(0);
+        }
+        BigDecimal add2 = new BigDecimal(y+"");
+        return  add1.subtract(add2).doubleValue() ;
+    }
+
+    private int sub(String x,int i){
+        return Integer.parseInt(x)-i;
     }
 
     private void addResult(TableLayout table,FeeOrderPayableJson json){
@@ -726,12 +991,32 @@ public class CarrierOrderCreateFragment extends Fragment {
 
         EditText exacctMoney = new EditText(getActivity());
         exacctMoney.setId(json.getIndex());
-        exacctMoney.setText(json.getExacctMoney() + "");
+        exacctMoney.setText(decimalFormat(json.getExacctMoney()));
+        exacctMoney.setInputType(InputType.TYPE_CLASS_NUMBER|InputType.TYPE_NUMBER_FLAG_DECIMAL);
+        exacctMoney.addTextChangedListener(new MyTextWatch(json.getExacctId()));
         exacctMoney.setWidth(300);
-        exacctMoney.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
         exacctMoney.setGravity(Gravity.CENTER);
         row.addView(exacctName);
         row.addView(exacctMoney);
+        table.addView(row);
+    }
+
+    private String decimalFormat(double value){
+        DecimalFormat df = new DecimalFormat("######0.00");
+        return df.format(value);
+    }
+
+    private void addEndResult(TableLayout table,BigDecimal decimal){
+        TableRow row = new TableRow(getActivity());
+        TextView exacctName = new TextView(getActivity());
+        exacctName.setText("总金额:");
+        exacctName.setGravity(Gravity.RIGHT);
+        TextView money = new TextView(getActivity());
+        money.setId(998+1);
+        money.setText(decimalFormat(decimal.doubleValue())+"");
+        money.setGravity(Gravity.CENTER);
+        row.addView(exacctName);
+        row.addView(money);
         table.addView(row);
     }
 
@@ -751,6 +1036,40 @@ public class CarrierOrderCreateFragment extends Fragment {
                 return false;
             }
             return false;
+        }
+    }
+
+    private class MyTextWatch implements TextWatcher{
+        private String oldValue;
+        private String id;
+        public MyTextWatch(String id) {
+            this.id = id;
+        }
+
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+           oldValue = s.toString();
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+        }
+
+        @Override
+        public void afterTextChanged(Editable s) {
+            if(s.length()!=0){
+                TextView num = (TextView)rootView.findViewById(998+1);
+                String count = num.getText().toString();
+                double value = add(s.toString(), sub(count, new Double(oldValue.length() == 0 ? "0" : oldValue)));
+                num.setText(value+"");
+                for(FeeOrderPayableJson json:payableJsons){
+                    if(id.equalsIgnoreCase(json.getExacctId())){
+                        json.setExacctMoney(new Double(s.toString()));
+                    }
+                }
+            }
+
         }
     }
 
@@ -814,47 +1133,53 @@ public class CarrierOrderCreateFragment extends Fragment {
         otdCarrierOrderBean.update(orderAddMore);
     }
 
-    private class FocusListener implements View.OnFocusChangeListener{
 
-        @Override
-        public void onFocusChange(View v, boolean hasFocus) {
-            //判断是否有此单号
-            if(!hasFocus){
-                String orderNumber = carrierOrderNumber.getText().toString().trim();
-                if(check(orderNumber)){
-                    String httpUrl = mySharedPreferences.getString("serviceAddress", "")+"/order/carrierOrder/"+orderNumber;
-                    JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, httpUrl,
-                            new Response.Listener<JSONObject>() {
-                                @Override
-                                public void onResponse(JSONObject response) {
-                                    try {
-                                        Boolean isSuccess = response.getBoolean("success");
-                                        if(isSuccess){
-                                            AlertDialog.Builder builder  = new AlertDialog.Builder(getActivity());
-                                            builder.setTitle("提示" ) ;
-                                            builder.setMessage("已经有此单号!" ) ;
-                                            builder.setPositiveButton("重新输入" ,  null );
-                                            builder.show();
-                                        }
-                                    } catch (JSONException e) {
-                                        e.printStackTrace();
-                                    }
-                                }
-                            },
-                            new Response.ErrorListener() {
-                                @Override
-                                public void onErrorResponse(VolleyError error) {
-                                    if (progressDialog.isShowing() && progressDialog != null) {
-                                        progressDialog.dismiss();
-                                    }
-                                    showMassage("出现异常，请重新操作!");
-                                }
-                            }
-                    );
-                    requestQueue.add(request);
-                }
-            }
+    private void checkNumber(String orderNumber){
+        if(!check(orderNumber)){
+            showMassage("请输入单号!");
+            return;
         }
+        if(!check(carrierIdValue.getText().toString())){
+            showMassage("请选择承运商!");
+            return;
+        }
+        final ProgressDialog check = ProgressDialog.show(getActivity(),"提示","正在检查是否有此单号！");
+        Map<String,String> map = new HashMap<>();
+        map.put("id",carrierIdValue.getText().toString());
+        map.put("orderNumber",orderNumber);
+        String httpUrl = mySharedPreferences.getString("serviceAddress", "")+"/order/getCarrierOrderByCarrier";
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, httpUrl,new JSONObject(map),
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        if (check.isShowing() && check != null) {
+                            check.dismiss();
+                        }
+                        try {
+                            Boolean isSuccess = response.getBoolean("success");
+                            if(isSuccess){
+                                AlertDialog.Builder builder  = new AlertDialog.Builder(getActivity());
+                                builder.setTitle("提示" ) ;
+                                builder.setMessage("已经有此单号!" ) ;
+                                builder.setPositiveButton("重新输入" ,  null );
+                                builder.show();
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        if (check.isShowing() && check != null) {
+                            check.dismiss();
+                        }
+                        showMassage("出现异常，请重新操作!");
+                    }
+                }
+        );
+        requestQueue.add(request);
     }
 
     private void closeInput(){

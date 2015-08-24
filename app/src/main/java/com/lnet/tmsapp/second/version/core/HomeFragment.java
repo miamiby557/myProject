@@ -27,6 +27,7 @@ public class HomeFragment extends Fragment {
     MyImageView carSend;
     MyImageView carBack;
     MyImageView paichedan;
+    MyImageView orderSignUp;
     Fragment fragment;
 
     public HomeFragment() {
@@ -59,6 +60,7 @@ public class HomeFragment extends Fragment {
         carSend = (MyImageView)view.findViewById(R.id.car_send);
         carBack = (MyImageView)view.findViewById(R.id.car_back);
         paichedan = (MyImageView)view.findViewById(R.id.paichedan_create);
+        orderSignUp = (MyImageView)view.findViewById(R.id.order_sign_up);
         transportOrderCreate.setOnClickIntent(new MyImageView.OnViewClickListener() {
             @Override
             public void onViewClick(MyImageView view) {
@@ -98,6 +100,14 @@ public class HomeFragment extends Fragment {
             public void onViewClick(MyImageView view) {
                 fragment = new PaichedanFragment();
                 String title = "派车单创建";
+                changeFragment(title);
+            }
+        });
+        orderSignUp.setOnClickIntent(new MyImageView.OnViewClickListener() {
+            @Override
+            public void onViewClick(MyImageView view) {
+                fragment = new OrderSignUpFragment();
+                String title = "订单签收";
                 changeFragment(title);
             }
         });

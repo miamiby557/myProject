@@ -35,19 +35,25 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
 import com.lnet.tmsapp.R;
 import com.lnet.tmsapp.application.ApplicationTrans;
-import com.lnet.tmsapp.model.FeeDeclare;
-import com.lnet.tmsapp.model.HttpHelper;
+import com.lnet.tmsapp.model.OtdCarrierOrderDetail;
+import com.lnet.tmsapp.model.OtdOrderSign;
 import com.lnet.tmsapp.model.ServiceResult;
 import com.lnet.tmsapp.util.DataItem;
 import com.lnet.tmsapp.util.GsonRequest;
 import com.lnet.tmsapp.util.JsonHelper;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -57,36 +63,32 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 
-public class FeeDeclareFragment extends Fragment {
+public class OrderSignUpFragment extends Fragment {
 
     View rootView;
 
-    Button addFeeDeclare;
-    Button selectPic;
     Button pickUpPic;
     TableLayout table;
-    EditText declareNumber;
+    EditText orderNumber;
     List<String> numbers = new ArrayList<>();
+    EditText signUpPerson;
     EditText remark;
     ImageView imageView;
-    boolean hasPic = false;
     ScrollView scrollView;
-    int count = 100;//标记table内EditText
-    List<DataItem> items = new ArrayList<>();
     private String capturePath = null;
     SharedPreferences mySharedPreferences;
     ApplicationTrans application;
     RequestQueue requestQueue;
     Bitmap bitmap;
-    FeeDeclare feeDeclare = new FeeDeclare();
-    ProgressDialog loading;
+    OtdOrderSign orderSign = new OtdOrderSign();
 
     private final static String ALBUM_PATH
             = Environment.getExternalStorageDirectory() + "/pic/";
 
-    public FeeDeclareFragment() {
+    public OrderSignUpFragment() {
         // Required empty public constructor
     }
 
@@ -114,10 +116,10 @@ public class FeeDeclareFragment extends Fragment {
     }
 
     private void create(){
-        new AlertDialog.Builder(getActivity()).setTitle("创建费用申报").setMessage("确认创建？")
+        new AlertDialog.Builder(getActivity()).setTitle("签收订单").setMessage("确认签收？")
                 .setPositiveButton("确定", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        saveFeeDeclare();
+                        saveOrderSignIn();
                     }})
                 .setNegativeButton("取消",null)
                 .show();
@@ -126,36 +128,25 @@ public class FeeDeclareFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        rootView = inflater.inflate(R.layout.fee_declare, container, false);
+        rootView = inflater.inflate(R.layout.order_sign_up, container, false);
         application = (ApplicationTrans)getActivity().getApplication();
         mySharedPreferences = getActivity().getSharedPreferences(application.getFILENAME(), application.getMODE());
         requestQueue = Volley.newRequestQueue(getActivity().getApplicationContext());
-        addFeeDeclare = (Button)rootView.findViewById(R.id.add_fee_declare);
-        selectPic = (Button)rootView.findViewById(R.id.select_pic);
         table = (TableLayout)rootView.findViewById(R.id.add_fee_declare_table);
-        declareNumber = (EditText)rootView.findViewById(R.id.number);
+        orderNumber = (EditText)rootView.findViewById(R.id.number);
+        orderNumber.setOnFocusChangeListener(new FocusListener());
+        orderNumber.setOnTouchListener(new TouchEvent());
+        signUpPerson = (EditText)rootView.findViewById(R.id.signup_person);
         remark = (EditText)rootView.findViewById(R.id.remark);
-        declareNumber.setOnTouchListener(new TouchEvent());
         pickUpPic = (Button)rootView.findViewById(R.id.pick_up);
         imageView = (ImageView)rootView.findViewById(R.id.imageView);
+
 
         scrollView = (ScrollView)rootView.findViewById(R.id.t_scrollview);
         scrollView.setOnTouchListener(new View.OnTouchListener() {
             public boolean onTouch(View arg0, MotionEvent arg1) {
                 InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(getActivity().getApplicationContext().INPUT_METHOD_SERVICE);
                 return imm.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), 0);
-            }
-        });
-        addFeeDeclare.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                addFeeDeclare();
-            }
-        });
-        selectPic.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                selectPic();
             }
         });
         pickUpPic.setOnClickListener(new View.OnClickListener() {
@@ -171,7 +162,7 @@ public class FeeDeclareFragment extends Fragment {
         @Override
         public boolean onTouch(View v, MotionEvent event) {
             if (event.getAction() == MotionEvent.ACTION_UP) {
-                int size = declareNumber.getRight();
+                int size = orderNumber.getRight();
                 int x = (int) event.getX();
                 if (x > size - 100) {
                     //扫描
@@ -185,77 +176,73 @@ public class FeeDeclareFragment extends Fragment {
         }
     }
 
-    //增加费用科目
-    private void addFeeDeclare(){
-        TableRow row = new TableRow(getActivity());
-        EditText feeDeclareName = new EditText(getActivity());
-        feeDeclareName.setId(count++);
-        feeDeclareName.setFocusable(true);
-        feeDeclareName.setWidth(240);
+    private class FocusListener implements View.OnFocusChangeListener{
 
-        EditText money = new EditText(getActivity());
-        money.setId(count++);
-        money.setWidth(200);
-        money.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
-        Button button = new Button(getActivity());
-        button.setWidth(50);
-        button.setHeight(40);
-        button.setText("删除");
-        button.setGravity(Gravity.CENTER);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                TableRow tableRow = (TableRow) v.getParent();
-                table.removeView(tableRow);
+        @Override
+        public void onFocusChange(View v, boolean hasFocus) {
+            if(!hasFocus){
+                String number = orderNumber.getText().toString().trim();
+                if(check(number)){
+                    //从数据库得到运输订单
+                    String httpUrl = mySharedPreferences.getString("serviceAddress", "")+"/order/transportOrder/"+orderNumber;
+                    JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, httpUrl,
+                            new Response.Listener<JSONObject>(){
+                                @Override
+                                public void onResponse(JSONObject response){
+                                    try {
+                                        Boolean isSuccess = response.getBoolean("success");
+                                        if(!isSuccess){
+                                            AlertDialog.Builder builder  = new AlertDialog.Builder(getActivity());
+                                            builder.setTitle("提示" ) ;
+                                            builder.setMessage("没有此单号!" ) ;
+                                            builder.setPositiveButton("重新输入" ,  null );
+                                            builder.show();
+                                        }else{
+
+                                        }
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            },
+                            new Response.ErrorListener() {
+                                @Override
+                                public void onErrorResponse(VolleyError error) {
+
+                                }
+                            }
+                    );
+                    requestQueue.add(request);
+                }
             }
-        });
-
-        row.addView(feeDeclareName);
-        row.addView(money);
-        row.addView(button);
-        table.addView(row);
+        }
     }
 
-    private void saveFeeDeclare(){
-        if(numbers.contains(declareNumber.getText().toString().trim())){
-            showToast("此订单号已申报!");
+    private void saveOrderSignIn(){
+        if(numbers.contains(orderNumber.getText().toString().trim())){
+            showToast("此单号已签收!");
             return;
         }
-        if(!check(declareNumber.getText().toString().trim())){
-            showToast("输入所申报的订单号!");
-            return;
-        }
-        items.clear();
-        //遍历table，得到所有费用申报
-        for(int i=100;i<count;i++){
-            EditText editText = (EditText)rootView.findViewById(new Integer(i));
-            if(editText!=null){
-                String name = editText.getText().toString().trim();
-                EditText money = (EditText)rootView.findViewById(i+1);
-                DataItem item = new DataItem();
-                item.setTextName(name);
-                item.setTextValue(money.getText().toString().trim());
-                items.add(item);
-                i++;
-            }else {
-                i++;
-                continue;
-            }
-        }
-        if(items.size()==0){
-            showToast("请添加费用科目!");
+        if(!check(orderNumber.getText().toString().trim())){
+            showToast("输入签收单号!");
             return;
         }
 
-        loading = ProgressDialog.show(getActivity(), "提示", "请等待几秒钟...");
+        if(!check(signUpPerson.getText().toString().trim())){
+            showToast("输入签收人!");
+            return;
+        }
+        final ProgressDialog loading = ProgressDialog.show(getActivity(), "提示", "请等待几秒钟...");
+        Gson gson = JsonHelper.getGson();
         String photo = bitMapToString();
-        feeDeclare.setImagesString(photo);
-        feeDeclare.setFeeDeclares(items);
-        feeDeclare.setRemark(remark.getText().toString().trim());
-        feeDeclare.setDeclareOrderNumber(declareNumber.getText().toString().trim());
-        final Gson gson = JsonHelper.getGson();
-        String json = gson.toJson(feeDeclare);//如果有图片，toJson耗时7，8秒钟
-        String httpUrl = mySharedPreferences.getString("serviceAddress", "") + "/order/feeDeclare";
+        orderSign.setPhotoString(photo);
+        orderSign.setTransportOrderNumber(orderNumber.getText().toString().trim());
+        orderSign.setSignMan(signUpPerson.getText().toString().trim());
+        orderSign.setRemark(remark.getText().toString().trim());
+        String userId = application.getUserId();
+        orderSign.setCreateUserId(UUID.fromString(userId));
+        String json = gson.toJson(orderSign);
+        String httpUrl = mySharedPreferences.getString("serviceAddress", "") + "/order/orderSignUp";
         GsonRequest<ServiceResult> gsonRequest = new GsonRequest(httpUrl, ServiceResult.class, json, new Response.Listener<ServiceResult>() {
             @Override
             public void onResponse(ServiceResult response) {
@@ -264,10 +251,10 @@ public class FeeDeclareFragment extends Fragment {
                    loading.dismiss();
                 }
                 if(response.isSuccess()){
-                    showToast("创建成功!");
-                    numbers.add(declareNumber.getText().toString().trim());
+                    showToast("签收成功!");
+                    numbers.add(orderNumber.getText().toString().trim());
                 }else {
-                    showToast("创建失败!");
+                    showToast("签收失败!");
                 }
             }
         }, new Response.ErrorListener() {
@@ -277,16 +264,17 @@ public class FeeDeclareFragment extends Fragment {
                     loading.dismiss();
                 }
             }
-        });
+        }){
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map localHashMap = new HashMap();
+                localHashMap.put("Cookie", application.getCookie());
+                return localHashMap;
+            }
+        };
         requestQueue.add(gsonRequest);
     }
 
-    //选择图片
-    private void selectPic(){
-        Intent intent = new Intent(Intent.ACTION_PICK);
-        intent.setType("image/*");//相片类型
-        startActivityForResult(intent, 1);
-    }
     //拍照图片
     private void pickup(){
         Intent getImageByCamera = new Intent("android.media.action.IMAGE_CAPTURE");
@@ -304,8 +292,6 @@ public class FeeDeclareFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode){
-            case 1:
-                break;
             case 2:
                 if(capturePath.length()!=0){
                     BitmapFactory.Options options1 = new BitmapFactory.Options();
@@ -324,7 +310,7 @@ public class FeeDeclareFragment extends Fragment {
                 if(data!=null){
                     Bundle bundle = data.getExtras();
                     String scanResult = bundle.getString("result");
-                    declareNumber.setText(scanResult);
+                    orderNumber.setText(scanResult);
                 }
                 break;
             default:

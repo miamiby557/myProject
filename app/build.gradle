@@ -27,5 +27,5 @@ dependencies {
     compile 'org.json:json:20140107'
     compile 'com.google.code.gson:gson:2.3.1'
     compile 'com.google.zxing:core:3.2.0'
-
+    compile 'com.android.support:recyclerview-v7:+'
 }

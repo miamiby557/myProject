@@ -164,6 +164,30 @@
 
                 </LinearLayout>
 
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center">
+
+                    <com.lnet.tmsapp.view.MyImageView
+                        android:id="@+id/order_sign_up"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="2dp"
+                        android:scaleType="matrix"
+                        android:src="@drawable/order_create" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="签收"
+                        android:id="@+id/t6"
+                        android:textSize="20dp"
+                        android:textColor="@android:color/background_light" />
+
+                </LinearLayout>
+
 
             </LinearLayout>
         </LinearLayout>

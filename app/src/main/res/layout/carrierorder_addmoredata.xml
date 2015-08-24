@@ -74,9 +74,9 @@
                         android:layout_width="fill_parent"
                         android:layout_height="100dp"
                         android:id="@+id/c_receive_address"
-                        android:inputType="text"
                         android:hint="收货人地址"
-                        android:gravity="top" />
+                        android:gravity="top"
+                        android:inputType="textMultiLine" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -101,7 +101,7 @@
                         android:layout_width="fill_parent"
                         android:layout_height="100dp"
                         android:id="@+id/remarks"
-                        android:inputType="text"
+                        android:inputType="text|textMultiLine"
                         android:hint="备注"
                         android:gravity="top" />
                 </LinearLayout>

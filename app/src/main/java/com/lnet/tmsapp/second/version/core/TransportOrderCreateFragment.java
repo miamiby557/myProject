@@ -49,6 +49,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -59,6 +60,7 @@ public class TransportOrderCreateFragment extends Fragment {
     Spinner clientId;
     EditText clientIdValue;
     EditText clientOrderNumber;
+    Button check;
     String number;
     EditText totalItemQuantity;
     EditText totalPackageQuantity;
@@ -155,7 +157,13 @@ public class TransportOrderCreateFragment extends Fragment {
         receiveManPhone = (EditText)rootView.findViewById(R.id.t_receiveManPhone);
         receiveAddress = (EditText)rootView.findViewById(R.id.t_receiveManAddress);
         clientOrderNumber = (EditText)rootView.findViewById(R.id.t_number);
-        clientOrderNumber.setOnFocusChangeListener(new FocusChangeListener());
+        check = (Button)rootView.findViewById(R.id.check);
+        check.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                checkNumber(clientOrderNumber.getText().toString().trim());
+            }
+        });
         province1 = (Spinner)rootView.findViewById(R.id.t_province1);
         province2 = (Spinner)rootView.findViewById(R.id.t_province2);
         startCity = (Spinner)rootView.findViewById(R.id.t_start_city);
@@ -205,25 +213,27 @@ public class TransportOrderCreateFragment extends Fragment {
         }
     }
 
-    private class FocusChangeListener implements View.OnFocusChangeListener{
-
-        @Override
-        public void onFocusChange(View v, boolean hasFocus) {
-            if(!hasFocus){
-                String orderNumber = clientOrderNumber.getText().toString().trim();
-                if(check(orderNumber)){
-                    //检查是否有此客户单号
-                    checkNumber(orderNumber);
-                }
-            }
-        }
-    }
     private void checkNumber(String orderNumber){
-        String httpUrl = mySharedPreferences.getString("serviceAddress", "")+"/order/transportOrder/"+orderNumber;
-        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, httpUrl,
+        if(!check(orderNumber)){
+            showMassage("请输入单号!");
+            return;
+        }
+        if(!check(clientIdValue.getText().toString().trim())){
+            showMassage("请选择客户!");
+            return;
+        }
+        final ProgressDialog check = ProgressDialog.show(getActivity(),"提示","正在检查是否有此单号！");
+        Map<String,String> map = new HashMap<>();
+        map.put("id",clientIdValue.getText().toString());
+        map.put("orderNumber",orderNumber);
+        String httpUrl = mySharedPreferences.getString("serviceAddress", "")+"/order/getTransportOrderByClient";
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, httpUrl,new JSONObject(map),
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
+                        if (check.isShowing() && check != null) {
+                            check.dismiss();
+                        }
                         try {
                             Boolean isSuccess = response.getBoolean("success");
                             if(isSuccess){
@@ -241,8 +251,8 @@ public class TransportOrderCreateFragment extends Fragment {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        if (progressDialog.isShowing() && progressDialog != null) {
-                            progressDialog.dismiss();
+                        if (check.isShowing() && check != null) {
+                            check.dismiss();
                         }
                         showMassage("出现异常，请重新操作！");
                     }
@@ -255,6 +265,10 @@ public class TransportOrderCreateFragment extends Fragment {
 
         @Override
         public boolean onTouch(View v, MotionEvent event) {
+            if(!check(clientIdValue.getText().toString())){
+                showMassage("请先选择客户!");
+                return false;
+            }
             if (event.getAction() == MotionEvent.ACTION_UP) {
                 int size = clientOrderNumber.getRight();
                 int x = (int) event.getX();
@@ -276,7 +290,7 @@ public class TransportOrderCreateFragment extends Fragment {
             return;
         }
         //判断必需数据
-        if(!check(clientIdValue.getText().toString())){
+        if(!check(clientIdValue.getText().toString())) {
             showMassage("客户为空!");
             return;
         }
@@ -288,24 +302,24 @@ public class TransportOrderCreateFragment extends Fragment {
             showMassage("目的地为空!");
             return;
         }
-        if(!check(totalVolume.getText().toString().trim())){
-            showMassage("体积为空!");
-            return;
-        }
-        if(!check(totalWeight.getText().toString().trim())){
-            showMassage("重量为空!");
-            return;
-        }
-        /*if(!check(totalItemQuantity.getText().toString().trim())){
-            showMassage("数量为空!");
-            return;
-        }*/
-        if(!check(totalPackageQuantity.getText().toString().trim())){
+        if(!check(totalPackageQuantity.getText().toString().trim())) {
             showMassage("件数为空!");
             return;
         }
-        if(!check(dispatchTypeValue.getText().toString())){
+        if(!check(dispatchTypeValue.getText().toString())) {
             showMassage("请选择调度类型!");
+            return;
+        }
+        if(!check(receiveMan.getText().toString().trim())){
+            showMassage("输入收货人!");
+            return;
+        }
+        if(!check(receiveManPhone.getText().toString().trim())){
+            showMassage("输入收货人电话!");
+            return;
+        }
+        if(!check(receiveAddress.getText().toString().trim())){
+            showMassage("输入收获人地址!");
             return;
         }
         OtdTransportOrder order = new OtdTransportOrder();
@@ -318,11 +332,26 @@ public class TransportOrderCreateFragment extends Fragment {
         if(check(paymentTypeValue.getText().toString())){
             order.setPaymentType(Integer.parseInt(paymentTypeValue.getText().toString()));
         }
-        order.setTotalItemQuantity(Integer.parseInt(totalItemQuantity.getText().toString().trim()));
+        if(check(totalVolume.getText().toString().trim())){
+            order.setTotalVolume(new Double(totalVolume.getText().toString().trim()));
+        }else {
+            order.setTotalVolume(new Double(0));
+        }
+        if(check(totalWeight.getText().toString().trim())){
+            order.setTotalWeight(new Double(totalWeight.getText().toString().trim()));
+        }else{
+            order.setTotalWeight(new Double(0));
+        }
+        if(check(totalItemQuantity.getText().toString().trim())){
+            order.setTotalItemQuantity(Integer.parseInt(totalItemQuantity.getText().toString().trim()));
+        }else {
+            order.setTotalItemQuantity(0);
+        }
         order.setTotalPackageQuantity(Integer.parseInt(totalPackageQuantity.getText().toString().trim()));
         order.setOrderDispatchType(Integer.parseInt(dispatchTypeValue.getText().toString()));
         order.update(company.getText().toString().trim(),receiveMan.getText().toString().trim(),receiveManPhone.getText().toString().trim(),receiveAddress.getText().toString().trim());
-        order.setOrderType(2);
+        order.setStatus(2);
+        order.setReceiptPageNumber(0);
         progressDialog = ProgressDialog.show(getActivity(), "创建提示", "...创建中...");
         String userId = application.getUserId();
         if(check(startCityIdValue.getText().toString())){
@@ -333,8 +362,9 @@ public class TransportOrderCreateFragment extends Fragment {
                 order.setStartCityId(UUID.fromString(cityId));
             }
         }
+
         order.update(clientOrderNumber.getText().toString().trim(), UUID.fromString(clientIdValue.getText().toString().trim()), UUID.fromString(destCityIdValue.getText().toString())
-                , new Double(totalVolume.getText().toString().trim()), new Double(totalWeight.getText().toString().trim()), UUID.fromString(userId));
+                ,UUID.fromString(userId));
         Map object = JsonHelper.toMap(order);
         String httpUrl = mySharedPreferences.getString("serviceAddress","")+"/order/transportOrderCreate";
         HttpHelper httpHelper = new HttpHelper(application,getActivity(),requestQueue,progressDialog) {

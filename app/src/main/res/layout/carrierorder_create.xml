@@ -46,43 +46,136 @@
                     <LinearLayout
                         android:orientation="horizontal"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:gravity="center">
-
-                        <TableLayout
-                            android:id="@+id/add_transportorder_table"
+                        android:layout_height="match_parent">
+                        <HorizontalScrollView
                             android:layout_width="fill_parent"
                             android:layout_height="fill_parent"
-                            android:stretchColumns="1">
-                            <TableRow android:background="@android:color/holo_purple"
-                                android:layout_height="fill_parent" android:layout_width="fill_parent">
-                                <TextView
-                                    android:layout_width="100dp"
-                                    android:text="单号"
-                                    android:layout_height="40dp"
-                                    android:layout_gravity="center"
-                                    android:gravity="center" />
-
-                                <TextView
+                            android:fillViewport="true">
+                              <LinearLayout
+                                  android:layout_width="wrap_content"
+                                  android:layout_height="fill_parent"
+                                  android:orientation="vertical">
+                                <TableLayout
+                                    android:id="@+id/add_transportorder_table"
                                     android:layout_width="wrap_content"
-                                    android:text="体积/m³"
-                                    android:id="@+id/textView5"
-                                    android:gravity="center"
-                                    android:layout_gravity="center" />
-                                <TextView
-                                    android:text="重量/kg"
-                                    android:layout_width="70dp"
                                     android:layout_height="wrap_content"
-                                    android:layout_gravity="center"
-                                    android:gravity="center" />
-                                <TextView
-                                    android:text="操作"
-                                    android:layout_width="100dp"
-                                    android:layout_height="fill_parent"
-                                    android:layout_gravity="center"
-                                    android:gravity="center" />
-                            </TableRow>
-                        </TableLayout>
+                                    android:stretchColumns="1">
+                                    <TableRow android:background="@android:color/holo_purple"
+                                        android:layout_height="fill_parent" android:layout_width="fill_parent">
+                                        <TextView
+                                            android:layout_width="100dp"
+                                            android:text="单号"
+                                            android:layout_height="40dp"
+                                            android:layout_gravity="center"
+                                            android:gravity="center" />
+
+                                        <TextView
+                                            android:layout_width="70dp"
+                                            android:text="体积"
+                                            android:id="@+id/textView5"
+                                            android:gravity="center"
+                                            android:layout_gravity="center" />
+                                        <TextView
+                                            android:text="重量"
+                                            android:layout_width="70dp"
+                                            android:layout_height="wrap_content"
+                                            android:layout_gravity="center"
+                                            android:gravity="center" />
+
+                                        <TextView
+                                            android:text="件数"
+                                            android:layout_width="70dp"
+                                            android:layout_height="wrap_content"
+                                            android:layout_gravity="center"
+                                            android:gravity="center"
+                                            android:id="@+id/textView30" />
+
+                                        <TextView
+                                            android:text="回单份数"
+                                            android:layout_width="70dp"
+                                            android:layout_height="wrap_content"
+                                            android:layout_gravity="center"
+                                            android:gravity="center"
+                                            android:id="@+id/textView31" />
+
+                                        <TextView
+                                            android:text="包装类型"
+                                            android:layout_width="70dp"
+                                            android:layout_height="wrap_content"
+                                            android:layout_gravity="center"
+                                            android:gravity="center"
+                                            android:id="@+id/textView28" />
+
+                                        <TextView
+                                            android:text="操作"
+                                            android:layout_width="100dp"
+                                            android:layout_height="fill_parent"
+                                            android:layout_gravity="center"
+                                            android:gravity="center" />
+                                    </TableRow>
+                                </TableLayout>
+                                  <TableLayout
+                                      android:id="@+id/table"
+                                      android:layout_width="fill_parent"
+                                      android:layout_height="fill_parent"
+                                      android:stretchColumns="1">
+                                    <TableRow android:background="@android:color/holo_purple"
+                                        android:layout_height="fill_parent" android:layout_width="fill_parent">
+                                        <TextView
+                                            android:layout_width="100dp"
+                                            android:layout_height="40dp"
+                                            android:layout_gravity="center"
+                                            android:gravity="center"
+                                            android:text="总数" />
+
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:text="0"
+                                            android:id="@+id/total_volume"
+                                            android:gravity="center"
+                                            android:layout_gravity="center" />
+                                        <TextView
+                                            android:text="0"
+                                            android:layout_width="70dp"
+                                            android:layout_height="wrap_content"
+                                            android:layout_gravity="center"
+                                            android:gravity="center"
+                                            android:id="@+id/total_weight" />
+
+                                        <TextView
+                                            android:text="0"
+                                            android:layout_width="70dp"
+                                            android:layout_height="wrap_content"
+                                            android:layout_gravity="center"
+                                            android:gravity="center"
+                                            android:id="@+id/total_package_count" />
+
+                                        <TextView
+                                            android:text="0"
+                                            android:layout_width="70dp"
+                                            android:layout_height="wrap_content"
+                                            android:layout_gravity="center"
+                                            android:gravity="center"
+                                            android:id="@+id/receive_page_count" />
+
+                                        <TextView
+                                            android:layout_width="70dp"
+                                            android:layout_height="wrap_content"
+                                            android:layout_gravity="center"
+                                            android:gravity="center"
+                                            android:id="@+id/textView32" />
+
+                                        <TextView
+                                            android:layout_width="100dp"
+                                            android:layout_height="fill_parent"
+                                            android:layout_gravity="center"
+                                            android:gravity="center"
+                                            android:id="@+id/textView27" />
+
+                                    </TableRow>
+                                </TableLayout>
+                              </LinearLayout>
+                        </HorizontalScrollView>
                     </LinearLayout>
 
                     <LinearLayout
@@ -112,7 +205,7 @@
                             android:layout_height="fill_parent">
 
                         <EditText
-                                android:layout_width="fill_parent"
+                                android:layout_width="250dp"
                                 android:layout_height="wrap_content"
                             android:drawableRight="@drawable/scaning"
                             android:drawablePadding="15dp"
@@ -120,12 +213,36 @@
                             android:hint="输入托运单号"
                             android:inputType="textVisiblePassword" />
 
+                        <Button
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="检查"
+                            android:id="@+id/check" />
+
                     </LinearLayout>
+                        <LinearLayout
+                            android:orientation="horizontal"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent">
+                            <Button
+                                android:layout_width="wrap_content"
+                                android:layout_height="60dp"
+                                android:text="修改始发城市"
+                                android:id="@+id/change_start_city" />
+
+                            <TextView
+                                android:layout_width="fill_parent"
+                                android:layout_height="fill_parent"
+                                android:id="@+id/startCity"
+                                android:gravity="center_vertical" />
+                        </LinearLayout>
 
                     <LinearLayout
                             android:orientation="horizontal"
                             android:layout_width="fill_parent"
-                            android:layout_height="fill_parent">
+                            android:layout_height="fill_parent"
+                        android:visibility="gone"
+                        android:id="@+id/start_city_line">
 
                         <Spinner
                                 android:layout_width="130dp"
@@ -143,8 +260,26 @@
                     </LinearLayout>
                         <LinearLayout
                             android:orientation="horizontal"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent">
+                            <Button
+                                android:layout_width="wrap_content"
+                                android:layout_height="60dp"
+                                android:text="修改目的城市"
+                                android:id="@+id/change_dest_city" />
+
+                            <TextView
+                                android:layout_width="fill_parent"
+                                android:layout_height="fill_parent"
+                                android:id="@+id/destCity"
+                                android:gravity="center_vertical" />
+                        </LinearLayout>
+                        <LinearLayout
+                            android:orientation="horizontal"
                             android:layout_width="fill_parent"
-                            android:layout_height="fill_parent">
+                            android:layout_height="fill_parent"
+                            android:visibility="gone"
+                            android:id="@+id/dest_city_line">
 
                             <Spinner
                                 android:layout_width="130dp"
@@ -161,7 +296,7 @@
                                 android:visibility="invisible" />
                         </LinearLayout>
 
-                    <LinearLayout
+                    <!--<LinearLayout
                             android:orientation="horizontal"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent">
@@ -229,7 +364,7 @@
                             android:layout_height="wrap_content"
                             android:text="@string/text_size"
                             android:id="@+id/textView27" />
-                    </LinearLayout>
+                    </LinearLayout>-->
                     <LinearLayout
                             android:orientation="horizontal"
                             android:layout_width="match_parent"

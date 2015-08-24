@@ -39,6 +39,7 @@ public class OtdCarrierOrderBean implements Serializable{
     private Integer receiptPageNumber;
 
     private Set<OtdCarrierOrderDetail> details=new HashSet<>();
+    private Set<OtdCarrierOrderDetailView> detailViews=new HashSet<>();
 
     public OtdCarrierOrderBean() {
     }
@@ -52,16 +53,13 @@ public class OtdCarrierOrderBean implements Serializable{
         this.remark = remark;
     }
 
-    public void update(UUID carrierId,UUID destCityId, String carrierOrderNumber, Integer calculateType, Integer transportType,UUID createUserId,Integer totalPackageQuantity,Double totalVolume,Double totalWeight,Boolean isUpstairs) {
+    public void update(UUID carrierId,UUID destCityId, String carrierOrderNumber, Integer calculateType, Integer transportType,UUID createUserId,Boolean isUpstairs) {
         this.carrierId = carrierId;
         this.destCityId = destCityId;
         this.carrierOrderNumber = carrierOrderNumber;
         this.calculateType = calculateType;
         this.transportType = transportType;
         this.createUserId = createUserId;
-        this.totalPackageQuantity = totalPackageQuantity;
-        this.totalVolume = totalVolume;
-        this.totalWeight = totalWeight;
         this.modifyDate = DateUtils.getTimestampNow();
         this.createDate = DateUtils.getTimestampNow();
         this.isUpstairs = isUpstairs;
@@ -434,5 +432,19 @@ public class OtdCarrierOrderBean implements Serializable{
         this.consigneeAddress = orderAddMore.getConsigneeAddress();
         this.goodsName = orderAddMore.getGoodsName();
         this.remark = orderAddMore.getRemark();
+    }
+
+    public void update(String receiveMan, String receiveManPhone, String receiveManAddress) {
+        this.consignee = receiveMan;
+        this.consigneePhone = receiveManPhone;
+        this.consigneeAddress = receiveManAddress;
+    }
+
+    public Set<OtdCarrierOrderDetailView> getDetailViews() {
+        return detailViews;
+    }
+
+    public void setDetailViews(Set<OtdCarrierOrderDetailView> detailViews) {
+        this.detailViews = detailViews;
     }
 }
