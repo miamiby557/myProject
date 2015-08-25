@@ -153,8 +153,10 @@ public class LoginActivity extends Activity {
                         try {
                             String userId = response.getString("userId");
                             String userName = response.getString("username");
+                            long nextTime = response.getLong("nextTime");
                             application.setUserId(userId);
                             application.setLoginName(userName);
+                            application.setNextTime(nextTime);
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }

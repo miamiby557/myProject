@@ -2,6 +2,7 @@ package com.lnet.tmsapp.model;
 
 import java.sql.Timestamp;
 import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -22,7 +23,7 @@ public class OtdOrderSign{
     private Timestamp createDate;
     private UUID modifyUserId;
     private Timestamp modifyDate;
-    private String photoString;
+    private List<String> photoStrings;
 
     public UUID getCreateUserId() {
         return createUserId;
@@ -118,12 +119,12 @@ public class OtdOrderSign{
         this.remark = remark;
     }
 
-    public String getPhotoString() {
-        return photoString;
+    public List<String> getPhotoStrings() {
+        return photoStrings;
     }
 
-    public void setPhotoString(String photoString) {
-        this.photoString = photoString;
+    public void setPhotoStrings(List<String> photoStrings) {
+        this.photoStrings = photoStrings;
     }
 
     public String getTransportOrderNumber() {

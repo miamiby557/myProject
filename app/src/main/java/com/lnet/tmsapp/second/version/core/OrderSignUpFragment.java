@@ -14,6 +14,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.text.InputType;
@@ -63,6 +64,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 
@@ -76,14 +78,16 @@ public class OrderSignUpFragment extends Fragment {
     List<String> numbers = new ArrayList<>();
     EditText signUpPerson;
     EditText remark;
-    ImageView imageView;
     ScrollView scrollView;
     private String capturePath = null;
     SharedPreferences mySharedPreferences;
     ApplicationTrans application;
     RequestQueue requestQueue;
-    Bitmap bitmap;
+    List<Bitmap> bitmaps = new ArrayList<>();
     OtdOrderSign orderSign = new OtdOrderSign();
+    TableLayout picTable;
+    Map<Integer,String> photoUris = new HashMap<>();
+    int picNum = 1;
 
     private final static String ALBUM_PATH
             = Environment.getExternalStorageDirectory() + "/pic/";
@@ -139,8 +143,7 @@ public class OrderSignUpFragment extends Fragment {
         signUpPerson = (EditText)rootView.findViewById(R.id.signup_person);
         remark = (EditText)rootView.findViewById(R.id.remark);
         pickUpPic = (Button)rootView.findViewById(R.id.pick_up);
-        imageView = (ImageView)rootView.findViewById(R.id.imageView);
-
+        picTable = (TableLayout)rootView.findViewById(R.id.pic_table);
 
         scrollView = (ScrollView)rootView.findViewById(R.id.t_scrollview);
         scrollView.setOnTouchListener(new View.OnTouchListener() {
@@ -184,7 +187,7 @@ public class OrderSignUpFragment extends Fragment {
                 String number = orderNumber.getText().toString().trim();
                 if(check(number)){
                     //从数据库得到运输订单
-                    String httpUrl = mySharedPreferences.getString("serviceAddress", "")+"/order/transportOrder/"+orderNumber;
+                    String httpUrl = mySharedPreferences.getString("serviceAddress", "")+"/order/transportOrder/"+number;
                     JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, httpUrl,
                             new Response.Listener<JSONObject>(){
                                 @Override
@@ -234,8 +237,14 @@ public class OrderSignUpFragment extends Fragment {
         }
         final ProgressDialog loading = ProgressDialog.show(getActivity(), "提示", "请等待几秒钟...");
         Gson gson = JsonHelper.getGson();
-        String photo = bitMapToString();
-        orderSign.setPhotoString(photo);
+        List<String> photoStrings = new ArrayList<>();
+        for(Bitmap bitmap:bitmaps){
+            String photo = bitMapToString(bitmap);
+            if(photo!=null){
+                photoStrings.add(photo);
+            }
+        }
+        orderSign.setPhotoStrings(photoStrings);
         orderSign.setTransportOrderNumber(orderNumber.getText().toString().trim());
         orderSign.setSignMan(signUpPerson.getText().toString().trim());
         orderSign.setRemark(remark.getText().toString().trim());
@@ -286,6 +295,7 @@ public class OrderSignUpFragment extends Fragment {
         capturePath = ALBUM_PATH + System.currentTimeMillis() + ".jpg";
         getImageByCamera.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(new File(capturePath)));
         getImageByCamera.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 1);
+        photoUris.put(picNum, capturePath);
         startActivityForResult(getImageByCamera, 2);
     }
 
@@ -297,12 +307,66 @@ public class OrderSignUpFragment extends Fragment {
                     BitmapFactory.Options options1 = new BitmapFactory.Options();
                     options1.inJustDecodeBounds = true;
                     BitmapFactory.decodeFile(capturePath, options1);
-                    options1.inSampleSize = calculateInSampleSize(options1, 520, 560);  //110,160：转换后的宽和高，具体值会有些出入
+                    options1.inSampleSize = calculateInSampleSize(options1, 300, 400);  //转换后的宽和高，具体值会有些出入
                     options1.inJustDecodeBounds = false;
-                    bitmap = BitmapFactory.decodeFile(capturePath, options1);
+                    final Bitmap bitmap = BitmapFactory.decodeFile(capturePath, options1);
                     if(bitmap!=null){
-                        imageView.setImageBitmap(bitmap);
+                        bitmaps.add(bitmap);
+                        TableRow row = new TableRow(getActivity());
+                        row.setId(picNum+0);
+                        row.setPadding(0, 5, 0, 0);
+                        ImageView view = new ImageView(getActivity());
+                        view.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                TableRow tRow = (TableRow)v.getParent();
+                                int num = tRow.getId();
+                                Intent intent = new Intent(getActivity(),ImageShowerActivity.class);
+                                Bundle bundle = new Bundle();
+                                bundle.putString("uri",photoUris.get(num));
+                                intent.putExtras(bundle);
+                                getActivity().startActivity(intent);
+
+                            }
+                        });
+                        view.setImageBitmap(bitmap);
+                        Button delete = new Button(getActivity());
+                        delete.setGravity(Gravity.CENTER);
+                        delete.setText("删除");
+                        delete.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(final View v) {
+                                new AlertDialog.Builder(getActivity()).setTitle("删除图片").setMessage("确认删除？")
+                                        .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                TableRow tableRow = (TableRow) v.getParent();
+                                                picTable.removeView(tableRow);
+                                                bitmaps.remove(bitmap);
+                                                if (picTable.getChildCount() > 0) {
+                                                    pickUpPic.setText("再拍一张");
+                                                } else {
+                                                    pickUpPic.setText("拍一张");
+                                                }
+                                            }
+                                        })
+                                        .setNegativeButton("取消", null)
+                                        .show();
+
+                            }
+                        });
+                        row.addView(view);
+                        row.addView(delete);
+                        picTable.addView(row);
+                        picNum++;
+                        pickUpPic.setText("再拍一张");
                         showToast("图片已保存在pic文件夹下面!");
+                        Handler mHandler = new Handler();
+                        mHandler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                scrollView.fullScroll(ScrollView.FOCUS_DOWN);
+                            }
+                        });
                     }
                 }
                 break;
@@ -337,7 +401,7 @@ public class OrderSignUpFragment extends Fragment {
         return inSampleSize;
     }
 
-    private String bitMapToString(){
+    private String bitMapToString(Bitmap bitmap){
         if(bitmap!=null){
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             bitmap.compress(Bitmap.CompressFormat.JPEG,100,baos);

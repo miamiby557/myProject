@@ -1,9 +1,10 @@
 package com.lnet.tmsapp.model;
 
 
+import java.io.Serializable;
 import java.util.UUID;
 
-public class OtdCarrierOrderDetailView {
+public class OtdCarrierOrderDetailView implements Serializable{
     private UUID carrierOrderDetailId;
     private UUID carrierOrderId;
     private UUID transportOrderId;
@@ -15,6 +16,7 @@ public class OtdCarrierOrderDetailView {
     private String clientName;
     private Integer receiptPageNumber;
     private Integer wrapType;
+    private Integer wrapTypePosition;
     private String receiveCompany;
     private String receiveMan;
     private String destCity;
@@ -128,5 +130,13 @@ public class OtdCarrierOrderDetailView {
 
     public void setReceiveMan(String receiveMan) {
         this.receiveMan = receiveMan;
+    }
+
+    public Integer getWrapTypePosition() {
+        return wrapTypePosition;
+    }
+
+    public void setWrapTypePosition(Integer wrapTypePosition) {
+        this.wrapTypePosition = wrapTypePosition;
     }
 }

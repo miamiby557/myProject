@@ -4,8 +4,10 @@ import com.lnet.tmsapp.util.DateUtils;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -40,6 +42,7 @@ public class OtdCarrierOrderBean implements Serializable{
 
     private Set<OtdCarrierOrderDetail> details=new HashSet<>();
     private Set<OtdCarrierOrderDetailView> detailViews=new HashSet<>();
+    List<String> numbers = new ArrayList<>();
 
     public OtdCarrierOrderBean() {
     }
@@ -424,14 +427,14 @@ public class OtdCarrierOrderBean implements Serializable{
         this.billingCycle = billingCycle;
     }
 
-    public void update(OtdCarrierOrderBean orderAddMore) {
-        this.transferOrganizationId = orderAddMore.getTransferOrganizationId();
-        this.paymentType = orderAddMore.getPaymentType();
-        this.consignee = orderAddMore.getConsignee();
-        this.consigneePhone = orderAddMore.getConsigneePhone();
-        this.consigneeAddress = orderAddMore.getConsigneeAddress();
-        this.goodsName = orderAddMore.getGoodsName();
-        this.remark = orderAddMore.getRemark();
+    public void update(OtdCarrierOrderBean bean) {
+        this.transferOrganizationId = bean.getTransferOrganizationId();
+        this.paymentType = bean.getPaymentType();
+        this.consignee = bean.getConsignee();
+        this.consigneePhone = bean.getConsigneePhone();
+        this.consigneeAddress = bean.getConsigneeAddress();
+        this.goodsName = bean.getGoodsName();
+        this.remark = bean.getRemark();
     }
 
     public void update(String receiveMan, String receiveManPhone, String receiveManAddress) {
@@ -446,5 +449,13 @@ public class OtdCarrierOrderBean implements Serializable{
 
     public void setDetailViews(Set<OtdCarrierOrderDetailView> detailViews) {
         this.detailViews = detailViews;
+    }
+
+    public List<String> getNumbers() {
+        return numbers;
+    }
+
+    public void setNumbers(List<String> numbers) {
+        this.numbers = numbers;
     }
 }

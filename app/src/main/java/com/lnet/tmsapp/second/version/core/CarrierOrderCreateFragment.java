@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -31,6 +32,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ListAdapter;
 import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TableLayout;
@@ -46,14 +48,18 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.lnet.tmsapp.R;
 import com.lnet.tmsapp.application.ApplicationTrans;
 import com.lnet.tmsapp.model.FeeOrderPayableJson;
 import com.lnet.tmsapp.model.FeeOrderPayables;
 import com.lnet.tmsapp.model.HttpArrayHelper;
+import com.lnet.tmsapp.model.HttpHelper;
+import com.lnet.tmsapp.model.OtdCarrierOrder;
 import com.lnet.tmsapp.model.OtdCarrierOrderBean;
 import com.lnet.tmsapp.model.OtdCarrierOrderDetail;
 import com.lnet.tmsapp.model.OtdCarrierOrderDetailView;
+import com.lnet.tmsapp.model.OtdTransportOrder;
 import com.lnet.tmsapp.model.ServiceResult;
 import com.lnet.tmsapp.util.ArrayAdapterUtils;
 import com.lnet.tmsapp.util.DataItem;
@@ -100,31 +106,19 @@ public class CarrierOrderCreateFragment extends Fragment {
     EditText destCityIdValue;
     TextView startCityString;
     TextView destCityString;
-    TextView totalVolume;
-    TextView totalWeight;
-    TextView totalItemQuantity;
-    TextView totalPackageQuantity;
-    TextView receivePageNumber;
+
     Spinner transportType;
     EditText transportTypeValue;
     Spinner calculateType;
     EditText calculateTypeValue;
     CheckBox isUpstairs;
-    EditText addOrderNumber;
-    TableLayout transportOrderTable;
     TableLayout calculate_Table;
-    int num = 100;
     ScrollView activity_main;
-    ProgressDialog progressDialog;
-    List<String> numbers = new ArrayList<>();
-    Set<OtdCarrierOrderDetail> details;
-    Set<OtdCarrierOrderDetailView> detailViews;
+
     OtdCarrierOrderBean otdCarrierOrderBean = new OtdCarrierOrderBean();
     Set<FeeOrderPayableJson> payableJsons;
     ApplicationTrans application;
     SharedPreferences mySharedPreferences;
-
-    OtdCarrierOrderBean orderAddMore = new OtdCarrierOrderBean();
 
     ProgressDialog loading;
 
@@ -177,8 +171,7 @@ public class CarrierOrderCreateFragment extends Fragment {
         application = (ApplicationTrans)getActivity().getApplication();
         mySharedPreferences = getActivity().getSharedPreferences(application.getFILENAME(), application.getMODE());
         requestQueue = Volley.newRequestQueue(getActivity().getApplicationContext());
-        details=new HashSet<>();
-        detailViews = new HashSet<>();
+
         payableJsons = new HashSet<>();
         calculateButton = (Button)rootView.findViewById(R.id.c_calculate);
         addTransButton = (Button)rootView.findViewById(R.id.add_transorder);
@@ -227,21 +220,15 @@ public class CarrierOrderCreateFragment extends Fragment {
         destCityIdValue = new EditText(getActivity().getApplicationContext());
         startCityString = (TextView)rootView.findViewById(R.id.startCity);
         destCityString = (TextView)rootView.findViewById(R.id.destCity);
-        totalItemQuantity = new TextView(getActivity().getApplicationContext());
-        totalPackageQuantity = (TextView)rootView.findViewById(R.id.total_package_count);
-        totalVolume = (TextView)rootView.findViewById(R.id.total_volume);
-        receivePageNumber = (TextView)rootView.findViewById(R.id.receive_page_count);
-        totalWeight = (TextView)rootView.findViewById(R.id.total_weight);
+
         transportType = (Spinner)rootView.findViewById(R.id.c_transportType);
         transportTypeValue = new EditText(getActivity().getApplicationContext());
         calculateType = (Spinner)rootView.findViewById(R.id.c_calculateType);
         calculateTypeValue = new EditText(getActivity().getApplicationContext());
         isUpstairs = (CheckBox)rootView.findViewById(R.id.upstairs);
         calculate_Table = (TableLayout)rootView.findViewById(R.id.carrierorder_calculate_table);
-        transportOrderTable = (TableLayout)rootView.findViewById(R.id.add_transportorder_table);
 
-        addOrderNumber = (EditText)rootView.findViewById(R.id.add_order);
-        addOrderNumber.setOnTouchListener(new AddTransportOrderTouchEvent());
+
 
         additionOther.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -249,7 +236,7 @@ public class CarrierOrderCreateFragment extends Fragment {
                 //完善订单信息
                 Intent openCameraIntent = new Intent(getActivity(),CarrierOrderAddOtherActivity.class);
                 Bundle bundle = new Bundle();
-                bundle.putSerializable("order",orderAddMore);
+                bundle.putSerializable("order",otdCarrierOrderBean);
                 openCameraIntent.putExtras(bundle);
                 startActivityForResult(openCameraIntent, 1);
             }
@@ -258,7 +245,12 @@ public class CarrierOrderCreateFragment extends Fragment {
         addTransButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                addTransportOrder();
+                //添加运输订单
+                Intent intent = new Intent(getActivity(),AddTransportOrderActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("order",otdCarrierOrderBean);
+                intent.putExtras(bundle);
+                startActivityForResult(intent, 3);
             }
         });
         calculateButton.setOnClickListener(new View.OnClickListener() {
@@ -297,7 +289,7 @@ public class CarrierOrderCreateFragment extends Fragment {
                 String superBaseRegionId = ((DataItem) province1.getSelectedItem()).getTextValue();
                 if (superBaseRegionId.length() != 0) {
                     //绑定城市
-                    getCity(superBaseRegionId, "选择出发城市", startCity, startCityIdValue);
+                    getCity(superBaseRegionId, "选择出发城市", startCity, startCityIdValue,startCityString,"始发城市改为:");
                 }
             }
 
@@ -313,7 +305,7 @@ public class CarrierOrderCreateFragment extends Fragment {
                 String superBaseRegionId = ((DataItem) province2.getSelectedItem()).getTextValue();
                 if (superBaseRegionId.length() != 0) {
                     //绑定城市
-                    getCity(superBaseRegionId, "选择目的城市", destCity, destCityIdValue);
+                    getCity(superBaseRegionId, "选择目的城市", destCity, destCityIdValue, destCityString, "目的城市改为:");
                 }
             }
 
@@ -324,7 +316,7 @@ public class CarrierOrderCreateFragment extends Fragment {
         });
     }
 
-    private void getCity(String superBaseRegionId, final String defaultName, final Spinner spinner, final EditText editText){
+    private void getCity(String superBaseRegionId, final String defaultName, final Spinner spinner, final EditText editText, final TextView textView, final String string){
         spinner.setVisibility(View.VISIBLE);
         final List<DataItem> cities = new ArrayList<>();
         HttpArrayHelper cityArrayHelper = new HttpArrayHelper(application, getActivity(), requestQueue, loading) {
@@ -346,8 +338,10 @@ public class CarrierOrderCreateFragment extends Fragment {
                 spinner.setAdapter(myaAdapter);
                 spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                        String textValue = ((DataItem) spinner.getSelectedItem()).getTextValue();
+                        DataItem item = (DataItem) spinner.getSelectedItem();
+                        String textValue = item.getTextValue();
                         editText.setText(textValue);
+                        textView.setText(string+item.getTextName());
                     }
 
                     @Override
@@ -436,18 +430,7 @@ public class CarrierOrderCreateFragment extends Fragment {
             showMassage("目的城市为空!");
             return;
         }
-        if(!check(totalPackageQuantity.getText().toString().trim())) {
-            showMassage("件数为空!");
-            return;
-        }
-        if(!check(totalVolume.getText().toString().trim())){
-            showMassage("体积为空!");
-            return;
-        }
-        if(!check(totalWeight.getText().toString().trim())){
-            showMassage("重量为空!");
-            return;
-        }
+
         if(!check(transportTypeValue.getText().toString())){
             showMassage("请选择运输方式!");
             return;
@@ -456,8 +439,8 @@ public class CarrierOrderCreateFragment extends Fragment {
             showMassage("请选择计费方式!");
             return;
         }
-        if(numbers.size()==0){
-            showMassage("请至少输入一个运输单!");
+        if(otdCarrierOrderBean.getDetails().size()==0){
+            showMassage("请至少添加一个运输单!");
             return;
         }
 
@@ -473,15 +456,7 @@ public class CarrierOrderCreateFragment extends Fragment {
                 otdCarrierOrderBean.setStartCityId(UUID.fromString(cityId));
             }
         }
-        /*for(OtdCarrierOrderDetail detail:details){
-            OtdCarrierOrderDetailView detailView = new OtdCarrierOrderDetailView();
-            detailView.setTransportOrderId(detail.getTransportOrderId());
-            detailView.setReceiptPageNumber(detail.getReceivePageNumber());
-            detailViews.add(detailView);
-        }*/
-        otdCarrierOrderBean.setDetails(details);
         otdCarrierOrderBean.setSendDate(new Date());
-        otdCarrierOrderBean.setDetailViews(detailViews);
         final Gson gson = JsonHelper.getGson();
         String httpUrl = mySharedPreferences.getString("serviceAddress", "") + "/order/carrierOrderCreate";
         final ProgressDialog createCarrierOrderProgressDialog = ProgressDialog.show(getActivity(), "提示", "...创建中...");
@@ -496,7 +471,7 @@ public class CarrierOrderCreateFragment extends Fragment {
                     showMassage("此单号已存在!");
                     return;
                 }
-                details.clear();
+//                details.clear();
                 Map<String, String> map = (Map<String, String>) response.getContent();
                 if (map != null) {
                     //创建成功后 ，更新费用
@@ -555,134 +530,6 @@ public class CarrierOrderCreateFragment extends Fragment {
         requestQueue.add(gsonRequest);
     }
 
-    private void addTransportOrder(){
-        closeInput();
-        String orderNumber = addOrderNumber.getText().toString().trim();
-        if(numbers.contains(orderNumber)){
-            showMassage("已经添加此单号!");
-            return;
-        }
-        if(orderNumber.length()==0){
-            showMassage("请输入运输单号!");
-            return;
-        }
-        progressDialog = ProgressDialog.show(getActivity(), "提示", "...提取运输订单中...");
-        //从数据库得到运输订单
-
-        String httpUrl = mySharedPreferences.getString("serviceAddress", "")+"/order/transportOrder/"+orderNumber;
-        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, httpUrl,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        if (progressDialog.isShowing() && progressDialog != null) {
-                            progressDialog.dismiss();
-                        }
-                        try {
-                            Boolean isSuccess = response.getBoolean("success");
-                            if(!isSuccess){
-                                AlertDialog.Builder builder  = new AlertDialog.Builder(getActivity());
-                                builder.setTitle("提示" ) ;
-                                builder.setMessage("没有此单号!" ) ;
-                                builder.setPositiveButton("重新输入" ,  null );
-                                builder.show();
-                            }else{
-                                try {
-                                    JSONObject content = response.getJSONObject("content");
-                                    String clientOrderNumber = content.getString("clientOrderNumber");
-                                    String transportOrderId = content.getString("transportOrderId");
-                                    double totalVolume = content.getDouble("totalVolume");
-                                    double totalWeight = content.getDouble("totalWeight");
-                                    int totalItemQuantity = content.getInt("totalItemQuantity");
-                                    int totalPackageQuantity = content.getInt("totalPackageQuantity");
-                                    String startCityId = content.getString("startCityId");
-                                    String destCityId = content.getString("destCityId");
-
-                                    if(!check(startCityIdValue.getText().toString())){
-                                        startCityIdValue.setText(startCityId);
-                                    }
-                                    if(!check(destCityIdValue.getText().toString())){
-                                        destCityIdValue.setText(destCityId);
-                                    }
-
-                                    if(orderAddMore!=null&&orderAddMore.getConsignee()==null){
-                                        String receiveMan = content.getString("receiveMan");
-                                        String receiveManPhone = content.getString("receivePhone");
-                                        String receiveManAddress = content.getString("receiveAddress");
-                                        orderAddMore.update(receiveMan,receiveManPhone,receiveManAddress);
-
-                                    }
-
-                                    OtdCarrierOrderDetail detail = new OtdCarrierOrderDetail();
-                                    detail.setTransportOrderId(UUID.fromString(transportOrderId));
-                                    detail.setConfirmedVolume(totalVolume);
-                                    detail.setConfirmedWeight(totalWeight);
-                                    detail.setConfirmedItemQuantity(totalItemQuantity);
-                                    detail.setConfirmedPackageQuantity(totalPackageQuantity);
-                                    detail.setReceivePageNumber(0);
-                                    details.add(detail);
-                                    OtdCarrierOrderDetailView detailView = new OtdCarrierOrderDetailView();
-                                    detailView.setTransportOrderId(detail.getTransportOrderId());
-                                    detailView.setReceiptPageNumber(detail.getReceivePageNumber());
-                                    detailViews.add(detailView);
-                                    numbers.add(clientOrderNumber);
-                                    if(!check(startCityString.getText().toString())){
-                                        String startCity = content.getString("startCity");
-                                        startCityString.setText("当前始发城市:"+startCity);
-                                        String destCity = content.getString("destCity");
-                                        destCityString.setText("当前目的城市:"+destCity);
-                                    }
-                                    addTransportOrder(transportOrderTable, clientOrderNumber, totalVolume, totalWeight, totalItemQuantity, totalPackageQuantity, 0, detail,detailView);
-                                    showToast("添加运输单成功!");
-                                    updateUI(totalVolume,totalWeight,totalItemQuantity,totalPackageQuantity,0);
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                    showMassage("此单某些数据不完整!");
-                                }
-                            }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        if (progressDialog.isShowing() && progressDialog != null) {
-                            progressDialog.dismiss();
-                        }
-                        showMassage("出现异常，请重新操作!");
-                    }
-                }
-        );
-        requestQueue.add(request);
-    }
-
-    private void updateUI(double tVolume, double tWeight, int tItemQuantity, int tPackageQuantity, int receiptPNumber) {
-        String num1 = totalVolume.getText().toString();
-        totalVolume.setText(add(num1, tVolume) + "");
-        String num2 = totalWeight.getText().toString();
-        totalWeight.setText(add(num2, tWeight) + "");
-        String num3 = totalItemQuantity.getText().toString();
-        totalItemQuantity.setText(add(num3,tItemQuantity)+"");
-        String num4 = totalPackageQuantity.getText().toString();
-        totalPackageQuantity.setText(add(num4,tPackageQuantity)+"");
-        String num5 = receivePageNumber.getText().toString();
-        receivePageNumber.setText(add(num5, receiptPNumber) + "");
-    }
-
-    private double add(String x, double y){
-        BigDecimal add1 = new BigDecimal(x);
-        BigDecimal add2 = new BigDecimal(y+"");
-        return  add1.add(add2).doubleValue() ;
-    }
-
-    private int add(String x,int i){
-        if(x.length()==0){
-           return i;
-        }
-        return Integer.parseInt(x)+i;
-    }
-
     private void calculateOrder(){
         //判断必需数据
         if(!check(carrierIdValue.getText().toString())){
@@ -697,24 +544,17 @@ public class CarrierOrderCreateFragment extends Fragment {
             showMassage("目的城市为空!");
             return;
         }
-        if(!check(totalPackageQuantity.getText().toString().trim())) {
-            showMassage("件数为空!");
-            return;
-        }
-        if(!check(totalVolume.getText().toString().trim())){
-            showMassage("体积为空!");
-            return;
-        }
-        if(!check(totalWeight.getText().toString().trim())){
-            showMassage("重量为空!");
-            return;
-        }
+
         if(!check(transportTypeValue.getText().toString())){
             showMassage("请选择运输方式!");
             return;
         }
         if(!check(calculateTypeValue.getText().toString())){
             showMassage("请选择计费方式!");
+            return;
+        }
+        if(otdCarrierOrderBean.getDetails().size()==0){
+            showMassage("请至少添加一个运输单!");
             return;
         }
 
@@ -739,16 +579,7 @@ public class CarrierOrderCreateFragment extends Fragment {
                 carrierOrderNumber.getText().toString(), Integer.parseInt(calculateTypeValue.getText().toString()),
                 Integer.parseInt(transportTypeValue.getText().toString()), UUID.fromString(userId),
                 isUpstairs.isChecked() ? true : false);
-        if(check(totalItemQuantity.getText().toString().trim())){
-            otdCarrierOrderBean.setTotalItemQuantity(Integer.parseInt(totalItemQuantity.getText().toString().trim()));
-        }else{
-            otdCarrierOrderBean.setTotalItemQuantity(0);
-        }
-        otdCarrierOrderBean.setTotalVolume(new Double(totalVolume.getText().toString()));
-        otdCarrierOrderBean.setTotalWeight(new Double(totalWeight.getText().toString()));
-        otdCarrierOrderBean.setTotalItemQuantity(Integer.parseInt(totalItemQuantity.getText().toString()));
-        otdCarrierOrderBean.setTotalPackageQuantity(Integer.parseInt(totalPackageQuantity.getText().toString()));
-        otdCarrierOrderBean.setReceiptPageNumber(Integer.parseInt(receivePageNumber.getText().toString()));
+
         Map map = JsonHelper.toMap(otdCarrierOrderBean);
         String httpUrl = mySharedPreferences.getString("serviceAddress","")+"/order/calculate";
         HttpArrayHelper httpHelper = new HttpArrayHelper(application,getActivity(),requestQueue,calculateDialog) {
@@ -787,215 +618,25 @@ public class CarrierOrderCreateFragment extends Fragment {
         httpHelper.post(httpUrl, new JSONObject(map));
     }
 
-    private void addTransportOrder(final TableLayout table, final String orderNumber,Double confirmedVolume,Double confirmedWeight,int totalItemQuantity,int totalPackageQuantity,int receiptPageNumber, final OtdCarrierOrderDetail detail, final OtdCarrierOrderDetailView detailView){
 
-        String id = detail.getTransportOrderId().toString();
-        TableRow row = new TableRow(getActivity());
-        TextView order = new TextView(getActivity());
-        order.setText(orderNumber);
-        order.setPadding(3, 3, 3, 3);
-        order.setGravity(Gravity.CENTER);
 
-        EditText volume = new EditText(getActivity());
-        int n1 = num++;
-        volume.setId(n1);
-        volume.setText(confirmedVolume + "");
-        volume.setInputType(InputType.TYPE_CLASS_NUMBER|InputType.TYPE_NUMBER_FLAG_DECIMAL);
-        volume.setPadding(3, 3, 3, 3);
-        volume.setGravity(Gravity.CENTER);
 
-        EditText weight = new EditText(getActivity());
-        int n2 = num++;
-        weight.setId(n2);
-        weight.setText(confirmedWeight + "");
-        weight.setInputType(InputType.TYPE_CLASS_NUMBER|InputType.TYPE_NUMBER_FLAG_DECIMAL);
-        weight.setPadding(3, 3, 3, 3);
-        weight.setGravity(Gravity.CENTER);
-
-        /*EditText totalItemCount = new EditText(getActivity());
-        int n3 = num++;
-        totalItemCount.setId(n3);
-        totalItemCount.setText(totalItemQuantity + "");
-        totalItemCount.setInputType(InputType.TYPE_CLASS_NUMBER);
-        totalItemCount.setPadding(3, 3, 3, 3);
-        totalItemCount.setGravity(Gravity.CENTER);*/
-
-        EditText totalPackageCount = new EditText(getActivity());
-        int n4 = num++;
-        totalPackageCount.setId(n4);
-        totalPackageCount.setText(totalPackageQuantity + "");
-        totalPackageCount.setInputType(InputType.TYPE_CLASS_NUMBER);
-        totalPackageCount.setPadding(3, 3, 3, 3);
-        totalPackageCount.setGravity(Gravity.CENTER);
-
-        EditText pageNumber = new EditText(getActivity());
-        int n5 = num++;
-        pageNumber.setId(n5);
-        pageNumber.setText(receiptPageNumber + "");
-        pageNumber.setInputType(InputType.TYPE_CLASS_NUMBER);
-        pageNumber.setPadding(3, 3, 3, 3);
-        pageNumber.setGravity(Gravity.CENTER);
-
-        //spinner
-        final Spinner wrapType = new Spinner(getActivity().getApplicationContext());
-        ArrayAdapter<DataItem> mAdapter = new ArrayAdapter<>(getActivity().getApplicationContext(),R.layout.list_item2,DataUtils.getWrapType());
-        wrapType.setAdapter(mAdapter);
-        wrapType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                DataItem dataItem = (DataItem) wrapType.getSelectedItem();
-                detailView.setWrapType(Integer.parseInt(dataItem.getTextValue()));
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-
-        Button button = new Button(getActivity());
-        button.setWidth(50);
-        button.setHeight(40);
-        button.setText("删除");
-        button.setPadding(3, 3, 3, 3);
-        button.setGravity(Gravity.CENTER);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                TableRow tableRow = (TableRow) v.getParent();
-                table.removeView(tableRow);
-                numbers.remove(orderNumber);
-                details.remove(detail);
-                updateUI(detail);
-            }
-        });
-
-        row.addView(order);
-        row.addView(volume);
-        row.addView(weight);
-//        row.addView(totalItemCount);
-        row.addView(totalPackageCount);
-        row.addView(pageNumber);
-        row.addView(wrapType);
-        row.addView(button);
-
-        table.addView(row);
-
-        volume.addTextChangedListener(new TransportDetailChange(id, 2, n1));
-        weight.addTextChangedListener(new TransportDetailChange(id, 3, n2));
-//        totalItemCount.addTextChangedListener(new TransportDetailChange(id, 4, n3));
-        totalPackageCount.addTextChangedListener(new TransportDetailChange(id, 5, n4));
-        pageNumber.addTextChangedListener(new TransportDetailChange(id,6,n5));
-
-        addOrderNumber.setText(null);
-    }
-
-    private class TransportDetailChange implements TextWatcher{
-        private String oldValue;
-        private String id;
-        private int position;
-        int i;
-        public TransportDetailChange(String id, int position,int i) {
-            this.id = id;
-            this.position = position;
-            this.i = i;
-        }
-
-        @Override
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            oldValue = s.toString();
-        }
-
-        @Override
-        public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-        }
-
-        @Override
-        public void afterTextChanged(Editable s) {
-            if(s.length()!=0){
-                String value = s.toString();
-                ProgressDialog update = ProgressDialog.show(getActivity(),"提示","更新中...");
-                for(OtdCarrierOrderDetail detail:details){
-                    if(detail.getTransportOrderId().toString().equalsIgnoreCase(id)){
-                        if(2 == position){
-                            String tVolume = totalVolume.getText().toString();
-                            double count = sub(tVolume,new Double(oldValue.length()==0?"0":oldValue));
-                            totalVolume.setText(add(value,count)+"");
-                            detail.setConfirmedVolume(new Double(value));
-                        }else if(3 == position){
-                            String tWeight = totalWeight.getText().toString();
-                            double count = sub(tWeight,new Double(oldValue.length()==0?"0":oldValue));
-                            totalWeight.setText(add(value,count)+"");
-                            detail.setConfirmedWeight(new Double(value));
-                        }else if(4 == position){
-                            String tItemCount = totalItemQuantity.getText().toString();
-                            int count = sub(tItemCount,Integer.parseInt(oldValue.length()==0?"0":oldValue));
-                            totalItemQuantity.setText(add(value,count)+"");
-                            detail.setConfirmedItemQuantity(Integer.parseInt(value));
-                        }
-                        else if(5 == position){
-                            String tPackageCount = totalPackageQuantity.getText().toString();
-                            int count = sub(tPackageCount,Integer.parseInt(oldValue.length() == 0 ? "0" : oldValue));
-                            totalPackageQuantity.setText(add(value,count)+"");
-                            detail.setConfirmedPackageQuantity(Integer.parseInt(value));
-                        }
-                        else if(6 == position){
-                            String receivePageCount = receivePageNumber.getText().toString();
-                            int count = sub(receivePageCount,Integer.parseInt(oldValue.length() == 0 ? "0" : oldValue));
-                            receivePageNumber.setText(add(value,count)+"");
-                            detail.setReceivePageNumber(Integer.parseInt(value));
-                        }
-                        if(update!=null&&update.isShowing()){
-                            update.dismiss();
-                        }
-                        break;
-                    }
-                }
-            }
-
-        }
-    }
-
-    private void updateUI(OtdCarrierOrderDetail detail) {
-        String num1 = totalVolume.getText().toString();
-        totalVolume.setText(sub(num1, detail.getConfirmedVolume()) + "");
-        String num2 = totalWeight.getText().toString();
-        totalWeight.setText(sub(num2, detail.getConfirmedWeight()) + "");
-        String num3 = totalItemQuantity.getText().toString();
-        totalItemQuantity.setText(sub(num3,detail.getConfirmedItemQuantity())+"");
-        String num4 = totalPackageQuantity.getText().toString();
-        totalPackageQuantity.setText(sub(num4,detail.getConfirmedPackageQuantity())+"");
-        String num5 = receivePageNumber.getText().toString();
-        receivePageNumber.setText(sub(num5, detail.getReceivePageNumber())+"");
-    }
-
-    private double sub(String x, double y){
-        BigDecimal add1 = new BigDecimal(x);
-        if(add1.equals(BigDecimal.ZERO)){
-           return new Double(0);
-        }
-        BigDecimal add2 = new BigDecimal(y+"");
-        return  add1.subtract(add2).doubleValue() ;
-    }
-
-    private int sub(String x,int i){
-        return Integer.parseInt(x)-i;
-    }
 
     private void addResult(TableLayout table,FeeOrderPayableJson json){
         TableRow row = new TableRow(getActivity());
+        row.setPadding(0,20,0,20);
         TextView exacctName = new TextView(getActivity());
         exacctName.setText(json.getExacctName() + ":");
         exacctName.setGravity(Gravity.RIGHT);
 
-        EditText exacctMoney = new EditText(getActivity());
+        TextView exacctMoney = new TextView(getActivity());
         exacctMoney.setId(json.getIndex());
         exacctMoney.setText(decimalFormat(json.getExacctMoney()));
-        exacctMoney.setInputType(InputType.TYPE_CLASS_NUMBER|InputType.TYPE_NUMBER_FLAG_DECIMAL);
+        exacctMoney.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
         exacctMoney.addTextChangedListener(new MyTextWatch(json.getExacctId()));
         exacctMoney.setWidth(300);
-        exacctMoney.setGravity(Gravity.CENTER);
+        exacctMoney.setOnClickListener(new OnClick(exacctMoney.getText().toString()));
+        exacctMoney.setGravity(Gravity.LEFT);
         row.addView(exacctName);
         row.addView(exacctMoney);
         table.addView(row);
@@ -1039,6 +680,44 @@ public class CarrierOrderCreateFragment extends Fragment {
         }
     }
 
+    private class OnClick implements View.OnClickListener{
+        private String oldValue;
+
+        public OnClick(String oldValue) {
+            this.oldValue = oldValue;
+        }
+
+        @Override
+        public void onClick(final View v) {
+            final EditText editText = new EditText(getActivity().getApplicationContext());
+            editText.setText(oldValue);
+            editText.setTextColor(Color.BLACK);
+            editText.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setTitle("请输入");
+            builder.setView(editText);
+            builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    String newValue = editText.getText().toString().trim();
+                    TextView textView = (TextView) v;
+                    textView.setText(newValue);
+                    dialog.dismiss();
+                    closeInput();
+                    Handler mHandler = new Handler();
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            activity_main.fullScroll(ScrollView.FOCUS_DOWN);
+                        }
+                    });
+                }
+            });
+            builder.setNegativeButton("取消", null);
+            builder.show();
+        }
+    }
+
     private class MyTextWatch implements TextWatcher{
         private String oldValue;
         private String id;
@@ -1072,25 +751,21 @@ public class CarrierOrderCreateFragment extends Fragment {
 
         }
     }
-
-    private class AddTransportOrderTouchEvent implements View.OnTouchListener{
-
-        @Override
-        public boolean onTouch(View v, MotionEvent event) {
-            if (event.getAction() == MotionEvent.ACTION_UP) {
-                int size = carrierOrderNumber.getRight();
-                int x = (int) event.getX();
-                if (x > size - 250) {
-                    //扫描
-                    Intent openCameraIntent = new Intent(getActivity(),CaptureActivity.class);
-                    startActivityForResult(openCameraIntent, 2);
-                    return true;
-                }
-                return false;
-            }
-            return false;
-        }
+    private double add(String x, double y){
+        BigDecimal add1 = new BigDecimal(x);
+        BigDecimal add2 = new BigDecimal(y+"");
+        return  add1.add(add2).doubleValue() ;
     }
+
+    private double sub(String x, double y){
+        BigDecimal add1 = new BigDecimal(x);
+        if(add1.equals(BigDecimal.ZERO)){
+            return new Double(0);
+        }
+        BigDecimal add2 = new BigDecimal(y+"");
+        return  add1.subtract(add2).doubleValue() ;
+    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode){
@@ -1101,36 +776,57 @@ public class CarrierOrderCreateFragment extends Fragment {
                     carrierOrderNumber.setText(scanResult1);
                 }
                 break;
+            case 3:
+                Bundle bundle10 = data.getExtras();
+                Serializable serializable1 = bundle10.getSerializable("order");
+                if(serializable1!=null){
+                    OtdCarrierOrderBean bean = (OtdCarrierOrderBean)serializable1;
+                    updateCarrierOrderInfo(bean);
+                }
+                break;
             case 1:
                 Bundle bundle2 = data.getExtras();
                 Serializable serializable = bundle2.getSerializable("order");
                 if(serializable!=null){
-                    orderAddMore = (OtdCarrierOrderBean)serializable;
-                    if(orderAddMore!=null){
-                        updateOrder();
+                    OtdCarrierOrderBean bean = (OtdCarrierOrderBean)serializable;
+                    if(bean!=null){
+                        updateOrder(bean);
                     }
                 }
                 break;
-            case 2:
-                if(data!=null){
-                    Bundle bundle3 = data.getExtras();
-                    String scanResult3 = bundle3.getString("result");
-                    addOrderNumber.setText(scanResult3);
-                    if(numbers.contains(scanResult3)){
-                        showMassage("已经添加此单号!");
-                        return;
-                    }
-                    addTransportOrder();
-                    Intent openCameraIntent = new Intent(getActivity(),CaptureActivity.class);
-                    startActivityForResult(openCameraIntent, 2);
-                }
-                break;
+
             default:
                 break;
         }
     }
-    private void updateOrder() {
-        otdCarrierOrderBean.update(orderAddMore);
+
+    private void updateCarrierOrderInfo(OtdCarrierOrderBean bean) {
+        if(!check(startCityString.getText().toString())){
+            String startCity = bean.getStartCity();
+            if(startCity!=null){
+                startCityString.setText("当前始发城市:"+startCity);
+                otdCarrierOrderBean.setStartCityId(bean.getStartCityId());
+            }
+            String destCity = bean.getDestCity();
+            if(destCity!=null){
+                destCityString.setText("当前目的城市:"+destCity);
+                otdCarrierOrderBean.setDestCityId(bean.getDestCityId());
+            }
+        }
+        otdCarrierOrderBean.setConsignee(bean.getConsignee());
+        otdCarrierOrderBean.setConsigneePhone(bean.getConsigneePhone());
+        otdCarrierOrderBean.setConsigneeAddress(bean.getConsigneeAddress());
+        otdCarrierOrderBean.setDetails(bean.getDetails());
+        otdCarrierOrderBean.setDetailViews(bean.getDetailViews());
+        otdCarrierOrderBean.setTotalVolume(bean.getTotalVolume());
+        otdCarrierOrderBean.setTotalWeight(bean.getTotalWeight());
+        otdCarrierOrderBean.setTotalItemQuantity(bean.getTotalItemQuantity());
+        otdCarrierOrderBean.setTotalPackageQuantity(bean.getTotalPackageQuantity());
+        otdCarrierOrderBean.setReceiptPageNumber(bean.getReceiptPageNumber());
+    }
+
+    private void updateOrder(OtdCarrierOrderBean bean) {
+        otdCarrierOrderBean.update(bean);
     }
 
 
@@ -1163,6 +859,8 @@ public class CarrierOrderCreateFragment extends Fragment {
                                 builder.setMessage("已经有此单号!" ) ;
                                 builder.setPositiveButton("重新输入" ,  null );
                                 builder.show();
+                            }else {
+                                showToast("此单号可以创建!");
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -1182,14 +880,6 @@ public class CarrierOrderCreateFragment extends Fragment {
         requestQueue.add(request);
     }
 
-    private void closeInput(){
-        View view =getActivity().getWindow().peekDecorView();
-        if (view != null) {
-            InputMethodManager inputManger = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-            inputManger.hideSoftInputFromWindow(view.getWindowToken(), 0);
-        }
-    }
-
     private boolean check(String value){
         if(value.length()!=0){
             return true;
@@ -1202,6 +892,14 @@ public class CarrierOrderCreateFragment extends Fragment {
         builder.setMessage(massage) ;
         builder.setPositiveButton("重新操作" ,  null );
         builder.show();
+    }
+
+    private void closeInput(){
+        View view =getActivity().getWindow().peekDecorView();
+        if (view != null) {
+            InputMethodManager inputManger = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+            inputManger.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
     }
 
     private void showToast(String massage){

@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:id="@+id/c_scrollview" android:background="@android:color/background_light">
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                  android:layout_width="fill_parent"
+                  android:layout_height="fill_parent"
+                  android:orientation="vertical"
+                  android:background="@android:color/background_light"
+        android:id="@+id/line">
+
+        <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:orientation="vertical"
+                android:gravity="center">
+
+            <LinearLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:orientation="vertical"
+                    android:gravity="center">
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:gravity="right">
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center">
+                        <TextView
+                            android:layout_width="230dp"
+                            android:layout_height="wrap_content"
+                            android:text="已经添加订单数:"
+                            android:id="@+id/textView34"
+                            android:layout_marginLeft="10dp"
+                            android:gravity="right" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0"
+                            android:id="@+id/order_count" />
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+                        <Button
+                            android:layout_width="80dp"
+                            android:layout_height="fill_parent"
+                            android:text="保存"
+                            android:id="@+id/button_save" />
+                    </LinearLayout>
+
+
+
+                </LinearLayout>
+
+                <LinearLayout
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+                    <LinearLayout
+                        android:orientation="horizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="left">
+                        <EditText
+                            android:layout_width="250dp"
+                            android:layout_height="wrap_content" android:hint="输入运输单号"
+                            android:id="@+id/add_order" android:inputType="text"
+                            android:drawableRight="@drawable/scaning"
+                            android:layout_marginLeft="5dp" />
+
+                        <Button
+                            android:layout_width="80dp"
+                            android:layout_height="wrap_content"
+                            android:text="@string/add_order"
+                            android:id="@+id/add_transorder" />
+                    </LinearLayout>
+                    <LinearLayout
+                        android:orientation="horizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+                        <HorizontalScrollView
+                            android:layout_width="fill_parent"
+                            android:layout_height="fill_parent"
+                            android:fillViewport="true">
+                              <LinearLayout
+                                  android:layout_width="wrap_content"
+                                  android:layout_height="fill_parent"
+                                  android:orientation="vertical">
+                                  <ScrollView
+                                      android:layout_width="wrap_content"
+                                      android:layout_height="wrap_content">
+                                      <LinearLayout
+                                          android:layout_width="fill_parent"
+                                          android:layout_height="fill_parent">
+                                          <TableLayout
+                                              android:id="@+id/table"
+                                              android:layout_width="wrap_content"
+                                              android:layout_height="wrap_content"
+                                              android:stretchColumns="1">
+                                              <TableRow android:background="@android:color/holo_purple"
+                                                  android:layout_height="fill_parent" android:layout_width="fill_parent">
+                                                  <TextView
+                                                      android:layout_width="100dp"
+                                                      android:text="单号"
+                                                      android:layout_height="40dp"
+                                                      android:layout_gravity="center"
+                                                      android:gravity="center" />
+
+                                                  <TextView
+                                                      android:layout_width="70dp"
+                                                      android:text="体积"
+                                                      android:id="@+id/textView5"
+                                                      android:gravity="center"
+                                                      android:layout_gravity="center" />
+                                                  <TextView
+                                                      android:text="重量"
+                                                      android:layout_width="70dp"
+                                                      android:layout_height="wrap_content"
+                                                      android:layout_gravity="center"
+                                                      android:gravity="center" />
+
+                                                  <TextView
+                                                      android:text="件数"
+                                                      android:layout_width="70dp"
+                                                      android:layout_height="wrap_content"
+                                                      android:layout_gravity="center"
+                                                      android:gravity="center"
+                                                      android:id="@+id/textView30" />
+
+                                                  <TextView
+                                                      android:text="回单份数"
+                                                      android:layout_width="70dp"
+                                                      android:layout_height="wrap_content"
+                                                      android:layout_gravity="center"
+                                                      android:gravity="center"
+                                                      android:id="@+id/textView31" />
+
+                                                  <TextView
+                                                      android:text="包装类型"
+                                                      android:layout_width="70dp"
+                                                      android:layout_height="wrap_content"
+                                                      android:layout_gravity="center"
+                                                      android:gravity="center"
+                                                      android:id="@+id/textView28" />
+
+                                                  <TextView
+                                                      android:text="操作"
+                                                      android:layout_width="100dp"
+                                                      android:layout_height="fill_parent"
+                                                      android:layout_gravity="center"
+                                                      android:gravity="center" />
+                                              </TableRow>
+                                          </TableLayout>
+                                      </LinearLayout>
+
+                                  </ScrollView>
+
+                                  <TableLayout
+                                      android:id="@+id/add_transportorder_table"
+                                      android:layout_width="fill_parent"
+                                      android:layout_height="fill_parent"
+                                      android:stretchColumns="1">
+                                    <TableRow android:background="@android:color/holo_purple"
+                                        android:layout_height="fill_parent" android:layout_width="fill_parent">
+                                        <TextView
+                                            android:layout_width="100dp"
+                                            android:layout_height="40dp"
+                                            android:text="总数"
+                                            android:gravity="fill_vertical"
+                                            android:layout_gravity="center" />
+
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:text="0"
+                                            android:id="@+id/total_volume"
+                                            android:gravity="fill_vertical"
+                                            android:layout_gravity="center" />
+                                        <TextView
+                                            android:text="0"
+                                            android:layout_width="70dp"
+                                            android:layout_height="wrap_content"
+                                            android:layout_gravity="center"
+                                            android:id="@+id/total_weight" />
+
+                                        <TextView
+                                            android:text="0"
+                                            android:layout_width="70dp"
+                                            android:layout_height="wrap_content"
+                                            android:layout_gravity="center"
+                                            android:id="@+id/total_package_count" />
+
+                                        <TextView
+                                            android:text="0"
+                                            android:layout_width="70dp"
+                                            android:layout_height="wrap_content"
+                                            android:layout_gravity="center"
+                                            android:id="@+id/receive_page_count" />
+
+                                        <TextView
+                                            android:layout_width="70dp"
+                                            android:layout_height="wrap_content"
+                                            android:layout_gravity="center"
+                                            android:id="@+id/textView32" />
+
+                                        <TextView
+                                            android:layout_width="100dp"
+                                            android:layout_height="fill_parent"
+                                            android:layout_gravity="center"
+                                            android:id="@+id/hh" />
+
+                                    </TableRow>
+                                </TableLayout>
+                              </LinearLayout>
+                        </HorizontalScrollView>
+                    </LinearLayout>
+
+
+
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

@@ -1,15 +1,17 @@
 package com.lnet.tmsapp.model;
 
 
+import java.io.Serializable;
 import java.util.UUID;
 
 /**
  * Created by admin on 2015/5/14.
  */
-public class OtdCarrierOrderDetail{
+public class OtdCarrierOrderDetail implements Serializable{
     private UUID carrierOrderDetailId;
     private UUID carrierOrderId;
     private UUID transportOrderId;
+    private String transportOrderNumber;
     private Integer confirmedItemQuantity;
     private Integer confirmedPackageQuantity;
     private Double confirmedVolume;
@@ -86,5 +88,13 @@ public class OtdCarrierOrderDetail{
 
     public void setReceivePageNumber(int receivePageNumber) {
         this.receivePageNumber = receivePageNumber;
+    }
+
+    public String getTransportOrderNumber() {
+        return transportOrderNumber;
+    }
+
+    public void setTransportOrderNumber(String transportOrderNumber) {
+        this.transportOrderNumber = transportOrderNumber;
     }
 }

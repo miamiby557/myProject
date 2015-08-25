@@ -137,7 +137,8 @@ public class TransportOrderListFragment extends Fragment {
                 if (response.length() == 0) {
                     showToast("没有记录！");
                 } else {
-                    for (int i = 0; i < response.length(); i++) {
+                    int length = response.length();
+                    for (int i = 0; i < length; i++) {
                         try {
                             JSONObject object = response.getJSONObject(i);
                             String transportOrderId = object.getString("transportOrderId");
@@ -161,38 +162,6 @@ public class TransportOrderListFragment extends Fragment {
     }
 
     private void selectByNumber(String number) {
-        /*final List<DataItem> list = new ArrayList<>();
-        String userId = application.getUserId();
-        String httpUrl = mySharedPreferences.getString("serviceAddress","")+ "/order/transportOrderListByNumber";
-        Map<String, String> map = new HashMap<>();
-        map.put("userId",userId);
-        map.put("number", number);
-        HttpArrayHelper httpHelper = new HttpArrayHelper(application,getActivity(), requestQueue, null) {
-            @Override
-            public void onResponse(JSONArray response) {
-                if(response.length()==0){
-                    ListAdapter adapter = new ListAdapter(getActivity(),new TransportOrderDetailFragment(),list,getActivity().getApplicationContext(),R.layout.list);
-                    listView.setAdapter(adapter);
-                    showToast("没有记录！");
-                }else{
-                    for (int i = 0; i < response.length(); i++) {
-                        try {
-                            JSONObject object = response.getJSONObject(i);
-                            String transportOrderId = object.getString("transportOrderId");
-                            String clientOrderNumber = object.getString("clientOrderNumber");
-                            DataItem item = new DataItem(transportOrderId,clientOrderNumber);
-                            list.add(item);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    ListAdapter adapter = new ListAdapter(getActivity(),new TransportOrderDetailFragment(),list,getActivity().getApplicationContext(),R.layout.list);
-                    listView.setAdapter(adapter);
-                }
-
-            }
-        };
-        httpHelper.post(httpUrl, new JSONObject(map));*/
         List<DataItem> items = getItemsByNumber(number);
         ListAdapter adapter = new ListAdapter(getActivity(),new TransportOrderDetailFragment(),items,getActivity().getApplicationContext(),R.layout.list);
         listView.setAdapter(adapter);

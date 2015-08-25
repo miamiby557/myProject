@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -18,6 +19,7 @@ import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.text.InputType;
 import android.util.Base64;
+import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -71,7 +73,6 @@ public class FeeDeclareFragment extends Fragment {
     List<String> numbers = new ArrayList<>();
     EditText remark;
     ImageView imageView;
-    boolean hasPic = false;
     ScrollView scrollView;
     int count = 100;//标记table内EditText
     List<DataItem> items = new ArrayList<>();
@@ -82,6 +83,10 @@ public class FeeDeclareFragment extends Fragment {
     Bitmap bitmap;
     FeeDeclare feeDeclare = new FeeDeclare();
     ProgressDialog loading;
+    Display display;
+    float scaleWidth;
+    float scaleHeight;
+    boolean num=true;
 
     private final static String ALBUM_PATH
             = Environment.getExternalStorageDirectory() + "/pic/";
@@ -131,6 +136,8 @@ public class FeeDeclareFragment extends Fragment {
         mySharedPreferences = getActivity().getSharedPreferences(application.getFILENAME(), application.getMODE());
         requestQueue = Volley.newRequestQueue(getActivity().getApplicationContext());
         addFeeDeclare = (Button)rootView.findViewById(R.id.add_fee_declare);
+        display = getActivity().getWindowManager().getDefaultDisplay();
+
         selectPic = (Button)rootView.findViewById(R.id.select_pic);
         table = (TableLayout)rootView.findViewById(R.id.add_fee_declare_table);
         declareNumber = (EditText)rootView.findViewById(R.id.number);
@@ -254,7 +261,7 @@ public class FeeDeclareFragment extends Fragment {
         feeDeclare.setRemark(remark.getText().toString().trim());
         feeDeclare.setDeclareOrderNumber(declareNumber.getText().toString().trim());
         final Gson gson = JsonHelper.getGson();
-        String json = gson.toJson(feeDeclare);//如果有图片，toJson耗时7，8秒钟
+        String json = gson.toJson(feeDeclare);
         String httpUrl = mySharedPreferences.getString("serviceAddress", "") + "/order/feeDeclare";
         GsonRequest<ServiceResult> gsonRequest = new GsonRequest(httpUrl, ServiceResult.class, json, new Response.Listener<ServiceResult>() {
             @Override
@@ -311,11 +318,21 @@ public class FeeDeclareFragment extends Fragment {
                     BitmapFactory.Options options1 = new BitmapFactory.Options();
                     options1.inJustDecodeBounds = true;
                     BitmapFactory.decodeFile(capturePath, options1);
-                    options1.inSampleSize = calculateInSampleSize(options1, 520, 560);  //110,160：转换后的宽和高，具体值会有些出入
+                    options1.inSampleSize = calculateInSampleSize(options1, 520, 560);  //转换后的宽和高，具体值会有些出入
                     options1.inJustDecodeBounds = false;
                     bitmap = BitmapFactory.decodeFile(capturePath, options1);
                     if(bitmap!=null){
                         imageView.setImageBitmap(bitmap);
+                        imageView.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Intent intent = new Intent(getActivity(),ImageShowerActivity.class);
+                                Bundle bundle = new Bundle();
+                                bundle.putString("uri",capturePath);
+                                intent.putExtras(bundle);
+                                getActivity().startActivity(intent);
+                            }
+                        });
                         showToast("图片已保存在pic文件夹下面!");
                     }
                 }

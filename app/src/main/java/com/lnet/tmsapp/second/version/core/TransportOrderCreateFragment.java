@@ -242,6 +242,8 @@ public class TransportOrderCreateFragment extends Fragment {
                                 builder.setMessage("已经有此单号！" );
                                 builder.setPositiveButton("重新输入" ,  null );
                                 builder.show();
+                            }else {
+                                showToast("此单号可以创建!");
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -379,7 +381,7 @@ public class TransportOrderCreateFragment extends Fragment {
 
             @Override
             public void onErrorResponse(JSONObject response) {
-
+                showToast("创建失败!");
             }
         };
         httpHelper.post(httpUrl,new JSONObject(object));

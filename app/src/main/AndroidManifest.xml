@@ -70,6 +70,13 @@
             android:screenOrientation="portrait"
             android:label="@string/app_name" >
         </activity>
+        <activity android:name=".second.version.core.ImageShowerActivity"
+           android:theme="@style/ImageScale" >
+        </activity>
+        <activity android:name=".second.version.core.AddTransportOrderActivity"
+            android:windowSoftInputMode="adjustUnspecified|stateHidden"
+            android:screenOrientation="portrait">
+        </activity>
     </application>
 
 </manifest>

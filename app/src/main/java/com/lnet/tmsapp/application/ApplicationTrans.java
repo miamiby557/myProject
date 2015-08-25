@@ -19,6 +19,8 @@ public class ApplicationTrans extends Application{
     private String currentCity;
     private String currentCityId;
 
+    private Long nextTime;
+
     private OtdCarrierOrderBean temp;
 
     private String cookie;
@@ -180,5 +182,13 @@ public class ApplicationTrans extends Application{
 
     public void setDispatchAssignList(List<DataItem> dispatchAssignList) {
         this.dispatchAssignList = dispatchAssignList;
+    }
+
+    public Long getNextTime() {
+        return nextTime;
+    }
+
+    public void setNextTime(Long nextTime) {
+        this.nextTime = nextTime;
     }
 }

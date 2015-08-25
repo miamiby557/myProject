@@ -33,7 +33,7 @@ public class LocationService extends Service{
         mySharedPreferences = getSharedPreferences(FILENAME,MODE);
         Timer timer = new Timer();
         ApplicationTrans application = ((ApplicationTrans)getApplication());
-        timer.schedule(new LocationSendWork(locationManager,application,mySharedPreferences,this),0,15*60*1000);//15分钟调用一次
+        timer.schedule(new LocationSendWork(locationManager,application,mySharedPreferences,this),0,application.getNextTime());//15分钟调用一次
 
     }
 }
