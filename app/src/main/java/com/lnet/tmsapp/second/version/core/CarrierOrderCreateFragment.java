@@ -823,6 +823,7 @@ public class CarrierOrderCreateFragment extends Fragment {
         otdCarrierOrderBean.setTotalItemQuantity(bean.getTotalItemQuantity());
         otdCarrierOrderBean.setTotalPackageQuantity(bean.getTotalPackageQuantity());
         otdCarrierOrderBean.setReceiptPageNumber(bean.getReceiptPageNumber());
+        otdCarrierOrderBean.setNumbers(bean.getNumbers());
     }
 
     private void updateOrder(OtdCarrierOrderBean bean) {

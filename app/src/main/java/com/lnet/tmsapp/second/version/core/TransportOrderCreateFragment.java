@@ -335,24 +335,34 @@ public class TransportOrderCreateFragment extends Fragment {
             order.setPaymentType(Integer.parseInt(paymentTypeValue.getText().toString()));
         }
         if(check(totalVolume.getText().toString().trim())){
-            order.setTotalVolume(new Double(totalVolume.getText().toString().trim()));
+            Double num = new Double(totalVolume.getText().toString().trim());
+            order.setTotalVolume(num);
+            order.setConfirmedVolume(num);
         }else {
             order.setTotalVolume(new Double(0));
+            order.setConfirmedVolume(new Double(0));
         }
         if(check(totalWeight.getText().toString().trim())){
-            order.setTotalWeight(new Double(totalWeight.getText().toString().trim()));
+            Double num = new Double(totalWeight.getText().toString().trim());
+            order.setTotalWeight(num);
+            order.setConfirmedWeight(num);
         }else{
             order.setTotalWeight(new Double(0));
+            order.setConfirmedWeight(new Double(0));
         }
         if(check(totalItemQuantity.getText().toString().trim())){
-            order.setTotalItemQuantity(Integer.parseInt(totalItemQuantity.getText().toString().trim()));
+            int num = Integer.parseInt(totalItemQuantity.getText().toString().trim());
+            order.setTotalItemQuantity(num);
+            order.setConfirmedItemQuantity(num);
         }else {
             order.setTotalItemQuantity(0);
+            order.setConfirmedItemQuantity(0);
         }
-        order.setTotalPackageQuantity(Integer.parseInt(totalPackageQuantity.getText().toString().trim()));
+        int num = Integer.parseInt(totalPackageQuantity.getText().toString().trim());
+        order.setTotalPackageQuantity(num);
+        order.setConfirmedPackageQuantity(num);
         order.setOrderDispatchType(Integer.parseInt(dispatchTypeValue.getText().toString()));
         order.update(company.getText().toString().trim(),receiveMan.getText().toString().trim(),receiveManPhone.getText().toString().trim(),receiveAddress.getText().toString().trim());
-        order.setStatus(2);
         order.setReceiptPageNumber(0);
         progressDialog = ProgressDialog.show(getActivity(), "创建提示", "...创建中...");
         String userId = application.getUserId();
