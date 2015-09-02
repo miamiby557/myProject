@@ -91,7 +91,7 @@ public class CarBackFragment extends Fragment {
         Map<String,String> map = new HashMap<>();
         map.put("userId",application.getUserId());
         map.put("orderNumber", number.getText().toString().trim());
-        ProgressDialog progressDialog = ProgressDialog.show(getActivity().getApplicationContext(), "提示", "发车中...");
+        ProgressDialog progressDialog = ProgressDialog.show(getActivity(), "提示", "发车中...");
         String url = mySharedPreferences.getString("serviceAddress", "") +"/location/carBack";
         HttpHelper helper = new HttpHelper(application,getActivity(),requestQueue,progressDialog) {
             @Override

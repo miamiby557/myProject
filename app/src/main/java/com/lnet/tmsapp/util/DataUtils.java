@@ -84,8 +84,8 @@ public class DataUtils {
         DataItem item4 = new DataItem("4","木柜");
         DataItem item5 = new DataItem("5","铁桶");
         DataItem item6 = new DataItem("6","膜");
-        items.add(item1);
         items.add(item2);
+        items.add(item1);
         items.add(item3);
         items.add(item4);
         items.add(item5);

@@ -70,6 +70,7 @@ import com.lnet.tmsapp.util.JsonHelper;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -96,7 +97,7 @@ public class CarrierOrderCreateFragment extends Fragment {
     Spinner carrierId;
     EditText carrierIdValue;
     EditText carrierOrderNumber;
-    String number;
+    List<String> numbers = new ArrayList<>();
     Button check;
     Spinner province1;
     Spinner province2;
@@ -106,6 +107,12 @@ public class CarrierOrderCreateFragment extends Fragment {
     EditText destCityIdValue;
     TextView startCityString;
     TextView destCityString;
+
+    TextView totalVolume;
+    TextView totalWeight;
+    TextView totalPackageCount;
+    TextView receivePageCount;
+    TextView orderCount;
 
     Spinner transportType;
     EditText transportTypeValue;
@@ -220,6 +227,12 @@ public class CarrierOrderCreateFragment extends Fragment {
         destCityIdValue = new EditText(getActivity().getApplicationContext());
         startCityString = (TextView)rootView.findViewById(R.id.startCity);
         destCityString = (TextView)rootView.findViewById(R.id.destCity);
+
+        totalVolume = (TextView)rootView.findViewById(R.id.totalVolume);
+        totalWeight = (TextView)rootView.findViewById(R.id.totalWeight);
+        totalPackageCount = (TextView)rootView.findViewById(R.id.totalPackageCount);
+        receivePageCount = (TextView)rootView.findViewById(R.id.receivePageCount);
+        orderCount = (TextView)rootView.findViewById(R.id.orderCount);
 
         transportType = (Spinner)rootView.findViewById(R.id.c_transportType);
         transportTypeValue = new EditText(getActivity().getApplicationContext());
@@ -414,9 +427,6 @@ public class CarrierOrderCreateFragment extends Fragment {
     }
 
     private void saveOrder(){
-        if(number!=null&&number.equalsIgnoreCase(carrierOrderNumber.getText().toString().trim())){
-            showMassage("已经创建此托运单!");
-        }
         //判断必需数据
         if(!check(carrierIdValue.getText().toString())){
             showMassage("承运商为空!");
@@ -425,6 +435,9 @@ public class CarrierOrderCreateFragment extends Fragment {
         if(!check(carrierOrderNumber.getText().toString().trim())){
             showMassage("托运单号为空!");
             return;
+        }
+        if(numbers.contains(carrierOrderNumber.getText().toString().trim()+carrierIdValue.getText().toString())){
+            showMassage("已经创建此托运单!");
         }
         if(!check(destCityIdValue.getText().toString())){
             showMassage("目的城市为空!");
@@ -471,7 +484,7 @@ public class CarrierOrderCreateFragment extends Fragment {
                     showMassage("此单号已存在!");
                     return;
                 }
-//                details.clear();
+                numbers.add(carrierOrderNumber.getText().toString().trim()+carrierIdValue.getText().toString());
                 Map<String, String> map = (Map<String, String>) response.getContent();
                 if (map != null) {
                     //创建成功后 ，更新费用
@@ -538,6 +551,10 @@ public class CarrierOrderCreateFragment extends Fragment {
         }
         if(!check(carrierOrderNumber.getText().toString().trim())){
             showMassage("托运单号为空!");
+            return;
+        }
+        if(!check(startCityIdValue.getText().toString())){
+            showMassage("始发城市为空!");
             return;
         }
         if(!check(destCityIdValue.getText().toString())){
@@ -801,29 +818,37 @@ public class CarrierOrderCreateFragment extends Fragment {
     }
 
     private void updateCarrierOrderInfo(OtdCarrierOrderBean bean) {
-        if(!check(startCityString.getText().toString())){
-            String startCity = bean.getStartCity();
-            if(startCity!=null){
-                startCityString.setText("当前始发城市:"+startCity);
-                otdCarrierOrderBean.setStartCityId(bean.getStartCityId());
-            }
-            String destCity = bean.getDestCity();
-            if(destCity!=null){
-                destCityString.setText("当前目的城市:"+destCity);
-                otdCarrierOrderBean.setDestCityId(bean.getDestCityId());
-            }
+        String startCity = bean.getStartCity();
+        if(startCity!=null){
+            startCityString.setText("当前始发城市:"+startCity);
+            otdCarrierOrderBean.setStartCityId(bean.getStartCityId());
+            startCityIdValue.setText(bean.getStartCityId().toString());
         }
-        otdCarrierOrderBean.setConsignee(bean.getConsignee());
-        otdCarrierOrderBean.setConsigneePhone(bean.getConsigneePhone());
-        otdCarrierOrderBean.setConsigneeAddress(bean.getConsigneeAddress());
+        String destCity = bean.getDestCity();
+        if(destCity!=null){
+            destCityString.setText("当前目的城市:"+destCity);
+            otdCarrierOrderBean.setDestCityId(bean.getDestCityId());
+            destCityIdValue.setText(bean.getDestCityId().toString());
+        }
+        if(otdCarrierOrderBean.getConsignee()==null){
+            otdCarrierOrderBean.setConsignee(bean.getConsignee());
+            otdCarrierOrderBean.setConsigneePhone(bean.getConsigneePhone());
+            otdCarrierOrderBean.setConsigneeAddress(bean.getConsigneeAddress());
+        }
         otdCarrierOrderBean.setDetails(bean.getDetails());
         otdCarrierOrderBean.setDetailViews(bean.getDetailViews());
         otdCarrierOrderBean.setTotalVolume(bean.getTotalVolume());
+        totalVolume.setText(bean.getTotalVolume()+"m³");
         otdCarrierOrderBean.setTotalWeight(bean.getTotalWeight());
+        totalWeight.setText(bean.getTotalWeight()+"kg");
         otdCarrierOrderBean.setTotalItemQuantity(bean.getTotalItemQuantity());
         otdCarrierOrderBean.setTotalPackageQuantity(bean.getTotalPackageQuantity());
+        totalPackageCount.setText(bean.getTotalPackageQuantity()+"");
         otdCarrierOrderBean.setReceiptPageNumber(bean.getReceiptPageNumber());
+        receivePageCount.setText(bean.getReceiptPageNumber()+"");
         otdCarrierOrderBean.setNumbers(bean.getNumbers());
+        orderCount.setText(bean.getOrderCount()+"");
+
     }
 
     private void updateOrder(OtdCarrierOrderBean bean) {

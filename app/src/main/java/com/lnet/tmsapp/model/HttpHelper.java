@@ -101,13 +101,13 @@ public abstract class HttpHelper {
 
     private void resolve(JSONObject response) {
         try {
+            if (progressDialog.isShowing() && progressDialog != null) {
+                progressDialog.dismiss();
+            }
             if (response.getBoolean("success")) {
                 JSONObject content = response.getJSONObject("content");
                 onResponse(content);
             } else{
-                if (progressDialog.isShowing() && progressDialog != null) {
-                    progressDialog.dismiss();
-                }
                 onErrorResponse(response);
             }
 

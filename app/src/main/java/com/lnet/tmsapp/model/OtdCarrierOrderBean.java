@@ -43,6 +43,7 @@ public class OtdCarrierOrderBean implements Serializable{
     private Set<OtdCarrierOrderDetail> details=new HashSet<>();
     private Set<OtdCarrierOrderDetailView> detailViews=new HashSet<>();
     List<String> numbers = new ArrayList<>();
+    String orderCount;
 
     public OtdCarrierOrderBean() {
     }
@@ -457,5 +458,13 @@ public class OtdCarrierOrderBean implements Serializable{
 
     public void setNumbers(List<String> numbers) {
         this.numbers = numbers;
+    }
+
+    public String getOrderCount() {
+        return orderCount;
+    }
+
+    public void setOrderCount(String orderCount) {
+        this.orderCount = orderCount;
     }
 }

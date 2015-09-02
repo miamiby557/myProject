@@ -123,7 +123,7 @@ public class AddTransportOrderActivity extends FragmentActivity{
         scrollView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                InputMethodManager imm = (InputMethodManager)getSystemService(getApplicationContext().INPUT_METHOD_SERVICE);
+                InputMethodManager imm = (InputMethodManager) getSystemService(getApplicationContext().INPUT_METHOD_SERVICE);
                 return imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
             }
         });
@@ -140,6 +140,7 @@ public class AddTransportOrderActivity extends FragmentActivity{
         otdCarrierOrderBean.setTotalPackageQuantity(Integer.parseInt(totalPackageQuantity.getText().toString()));
         otdCarrierOrderBean.setReceiptPageNumber(Integer.parseInt(receivePageNumber.getText().toString()));
         otdCarrierOrderBean.setNumbers(numbers);
+        otdCarrierOrderBean.setOrderCount(orderCount.getText().toString());
         Intent resultIntent = new Intent();
         Bundle bundle = new Bundle();
         bundle.putSerializable("order", otdCarrierOrderBean);
@@ -337,9 +338,11 @@ public class AddTransportOrderActivity extends FragmentActivity{
             String receiveMan = content.getString("receiveMan");
             String receiveManPhone = content.getString("receivePhone");
             String receiveManAddress = content.getString("receiveAddress");
-            otdCarrierOrderBean.setConsignee(receiveMan);
-            otdCarrierOrderBean.setConsigneePhone(receiveManPhone);
-            otdCarrierOrderBean.setConsigneeAddress(receiveManAddress);
+            if(otdCarrierOrderBean.getConsignee()==null){
+                otdCarrierOrderBean.setConsignee(receiveMan);
+                otdCarrierOrderBean.setConsigneePhone(receiveManPhone);
+                otdCarrierOrderBean.setConsigneeAddress(receiveManAddress);
+            }
             OtdCarrierOrderDetail detail = new OtdCarrierOrderDetail();
             detail.setTransportOrderId(UUID.fromString(transportOrderId));
             detail.setConfirmedVolume(totalVolume);
@@ -347,7 +350,7 @@ public class AddTransportOrderActivity extends FragmentActivity{
             detail.setConfirmedWeight(totalWeight);
             detail.setConfirmedItemQuantity(totalItemQuantity);
             detail.setConfirmedPackageQuantity(totalPackageQuantity);
-            detail.setReceivePageNumber(0);
+            detail.setReceivePageNumber(1);
             details.add(detail);
             OtdCarrierOrderDetailView detailView = new OtdCarrierOrderDetailView();
             detailView.setTransportOrderId(detail.getTransportOrderId());
@@ -355,7 +358,7 @@ public class AddTransportOrderActivity extends FragmentActivity{
             detailViews.add(detailView);
 
             numbers.add(clientOrderNumber+transportOrderId);
-            addTransportOrder(transportOrderTable, clientOrderNumber,transportOrderId, totalVolume, totalWeight, totalItemQuantity, totalPackageQuantity, 0, detail, detailView);
+            addTransportOrder(transportOrderTable, clientOrderNumber,transportOrderId, totalVolume, totalWeight, totalItemQuantity, totalPackageQuantity, 1, detail, detailView);
             showToast("添加运输单成功!");
             updateUI(totalVolume, totalWeight, totalItemQuantity, totalPackageQuantity, 0);
             String num = orderCount.getText().toString();

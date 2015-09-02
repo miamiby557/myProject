@@ -61,7 +61,7 @@ public class TransportOrderCreateFragment extends Fragment {
     EditText clientIdValue;
     EditText clientOrderNumber;
     Button check;
-    String number;
+    List<String> numbers = new ArrayList<>();
     EditText totalItemQuantity;
     EditText totalPackageQuantity;
     EditText totalVolume;
@@ -287,10 +287,7 @@ public class TransportOrderCreateFragment extends Fragment {
     }
 
     private void saveOrder(){
-        if(number!=null&&number.equalsIgnoreCase(clientOrderNumber.getText().toString().trim())){
-           showMassage("已经创建此单号!");
-            return;
-        }
+
         //判断必需数据
         if(!check(clientIdValue.getText().toString())) {
             showMassage("客户为空!");
@@ -298,6 +295,10 @@ public class TransportOrderCreateFragment extends Fragment {
         }
         if(!check(clientOrderNumber.getText().toString().trim())){
             showMassage("单号为空!");
+            return;
+        }
+        if(numbers.contains(clientOrderNumber.getText().toString().trim()+clientIdValue.getText().toString())){
+            showMassage("已经创建此单号!");
             return;
         }
         if(!check(destCityIdValue.getText().toString().trim())){
@@ -362,7 +363,7 @@ public class TransportOrderCreateFragment extends Fragment {
         order.setTotalPackageQuantity(num);
         order.setConfirmedPackageQuantity(num);
         order.setOrderDispatchType(Integer.parseInt(dispatchTypeValue.getText().toString()));
-        order.update(company.getText().toString().trim(),receiveMan.getText().toString().trim(),receiveManPhone.getText().toString().trim(),receiveAddress.getText().toString().trim());
+        order.update(company.getText().toString().trim(), receiveMan.getText().toString().trim(), receiveManPhone.getText().toString().trim(), receiveAddress.getText().toString().trim());
         order.setReceiptPageNumber(0);
         progressDialog = ProgressDialog.show(getActivity(), "创建提示", "...创建中...");
         String userId = application.getUserId();
@@ -385,7 +386,7 @@ public class TransportOrderCreateFragment extends Fragment {
                 if ( progressDialog != null && progressDialog.isShowing()) {
                     progressDialog.dismiss();
                 }
-                number = clientOrderNumber.getText().toString().trim();
+                numbers.add(clientOrderNumber.getText().toString()+clientIdValue.getText().toString());
                 showToast("创建运输单成功！");
             }
 
