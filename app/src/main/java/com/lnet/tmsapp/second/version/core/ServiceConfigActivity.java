@@ -40,14 +40,14 @@ public class ServiceConfigActivity extends Activity{
 
     LinearLayout linearLayout;
 
-    @Override
+    /*@Override
     protected void onStart() {
         super.onStart();
         ActionBar actionBar = this.getActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
-    }
+    }*/
 
-    @Override
+    /*@Override
     public boolean onOptionsItemSelected(MenuItem item)
     {
         switch (item.getItemId())
@@ -60,7 +60,7 @@ public class ServiceConfigActivity extends Activity{
             default:
                 return super.onOptionsItemSelected(item);
         }
-    }
+    }*/
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
